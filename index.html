@@ -302,15 +302,10 @@ function formatRM(value){
   return `RM ${n.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 }
 
-async function firstLoginVerified(userId){
-  const { data, error } = await client
-    .from("leingbox_user_security")
-    .select("first_login_verified")
-    .eq("user_id", userId)
-    .single();
-
+async function firstLoginVerified(){
+  const { data, error } = await client.rpc("get_leingbox_first_login_status");
   if(error) throw error;
-  return !!data?.first_login_verified;
+  return !!data;
 }
 
 async function sendFirstLoginOtp(email){
@@ -511,7 +506,7 @@ async function doLogin(){
   }
 
   try{
-    const verified=await firstLoginVerified(data.user.id);
+    const verified=await firstLoginVerified();
 
     if(!verified){
       await sendFirstLoginOtp(email);
@@ -623,7 +618,7 @@ client.auth.onAuthStateChange(async(event,session)=>{
   if(!session?.user)return;
 
   try{
-    const verified=await firstLoginVerified(session.user.id);
+    const verified=await firstLoginVerified();
     if(verified) await showApp(session.user);
     else await client.auth.signOut();
   }catch(err){
