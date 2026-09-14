@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leingbox Finance</title>
+  <style>
+*{box-sizing:border-box}
+:root{
+  --bg:#f4f5f7;
+  --card:#fff;
+  --text:#111;
+  --muted:#777;
+  --line:#e7e7e7;
+  --dark:#111;
+}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.hidden{display:none!important}
+.login-page{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:linear-gradient(180deg,#fafafa,#f1f2f4);
+}
+.login-card{
+  width:min(410px,100%);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:32px;
+  box-shadow:0 18px 50px rgba(0,0,0,.08);
+}
+.logo{
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.22em;
+}
+.logo.small{font-size:11px;margin-bottom:4px}
+h1{margin:12px 0 5px;font-size:30px}
+h2,h3{margin:0}
+.sub{margin:0 0 24px;color:var(--muted)}
+label{
+  display:block;
+  font-size:13px;
+  font-weight:750;
+  margin:16px 0 8px;
+}
+input{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:13px 14px;
+  font-size:16px;
+  outline:none;
+  background:#fff;
+}
+input:focus{border-color:#aaa}
+.btn{
+  border:0;
+  border-radius:14px;
+  padding:12px 16px;
+  font-weight:800;
+  cursor:pointer;
+}
+.primary{background:var(--dark);color:#fff}
+.secondary{background:#efefef;color:#222}
+.login-card .primary{width:100%;margin-top:22px}
+.error{
+  min-height:18px;
+  margin-top:10px;
+  font-size:13px;
+  color:#b42318;
+}
+.topbar{
+  height:78px;
+  padding:0 max(18px,calc((100vw - 1000px)/2));
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.user-area{display:flex;align-items:center;gap:10px}
+.pill{
+  padding:8px 11px;
+  border-radius:999px;
+  background:#f0f0f0;
+  font-size:12px;
+  font-weight:800;
+}
+.small-btn{padding:9px 12px}
+.container{
+  width:min(1000px,calc(100% - 28px));
+  margin:24px auto 48px;
+  display:grid;
+  gap:18px;
+}
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px;
+}
+.top-fields{
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:14px;
+}
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:20px;
+}
+.summary-item{
+  padding:18px;
+  border-radius:16px;
+  background:#f7f7f7;
+}
+.summary-item span{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:8px;
+}
+.summary-item strong{font-size:22px}
+.summary-item.balance{
+  background:#111;
+  color:#fff;
+}
+.summary-item.balance span{color:#ccc}
+.money-box{position:relative}
+.money-box span{
+  position:absolute;
+  left:13px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:13px;
+  color:#777;
+  z-index:1;
+}
+.money-box input{padding-left:42px}
+.panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
+}
+.panel-head p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+.add-btn{white-space:nowrap}
+.project-list{display:grid;gap:10px}
+.project-row{
+  display:grid;
+  grid-template-columns:1fr 220px auto;
+  gap:10px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fafafa;
+}
+.delete-btn{background:#eee;color:#555}
+.empty{
+  padding:28px 10px;
+  text-align:center;
+  border:1px dashed #d7d7d7;
+  border-radius:16px;
+  color:#888;
+}
+@media(max-width:700px){
+  .top-fields,.summary,.project-row{grid-template-columns:1fr}
+  .panel-head{align-items:stretch;flex-direction:column}
+  .add-btn{width:100%}
+  .topbar{padding:0 14px}
+}
+
+
+.project-head,.project-row{
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(72px,.9fr) minmax(72px,.9fr) minmax(78px,.9fr) 58px 58px 38px;
+  gap:8px;
+  align-items:center;
+}
+.project-head{
+  font-size:12px;
+  font-weight:700;
+  opacity:.7;
+  margin:8px 0;
+}
+.project-row{margin-bottom:8px;}
+.project-row input{width:100%;min-width:0;box-sizing:border-box;}
+.project-row .remain{font-weight:700;text-align:right;white-space:nowrap;font-size:13px;}
+.project-row .remain.negative{color:#d32f2f;}
+.project-row .delete-btn{padding:8px 4px;}
+@media(max-width:520px){
+  .project-head,.project-row{
+    grid-template-columns:minmax(0,1.35fr) minmax(58px,.8fr) minmax(58px,.8fr) minmax(68px,.9fr) 46px 46px 30px;
+    gap:5px;
+  }
+  .project-head{font-size:10px;}
+  .project-row input{padding:9px 6px;font-size:12px;}
+  .project-row .remain{font-size:11px;}
+}
+
+
+.page-tabs{
+  display:flex;gap:8px;margin:0 0 14px 0;
+}
+.page-tab{
+  border:1px solid #ddd;background:#fff;padding:9px 14px;border-radius:999px;font-weight:700;cursor:pointer;
+}
+.page-tab.active{background:#111;color:#fff;border-color:#111}
+.history-list{display:grid;gap:14px}
+.history-month{border:1px solid #e6e6e6;border-radius:16px;padding:14px;background:#fff}
+.history-month h3{margin:0 0 10px;font-size:16px}
+.history-row{
+  display:grid;
+  grid-template-columns:72px minmax(0,1.3fr) minmax(70px,.7fr) minmax(70px,.7fr) minmax(72px,.7fr) 92px;
+  gap:8px;align-items:center;padding:9px 0;border-top:1px solid #f0f0f0;font-size:13px;
+}
+.history-row:first-of-type{border-top:0}
+.submit-project-btn{background:#eee;color:#111;border:0;border-radius:10px;padding:9px 8px;font-weight:700;cursor:pointer}
+.finish-btn{background:#111;color:#fff;border:0;border-radius:10px;padding:9px 10px;font-weight:700;cursor:pointer}
+@media(max-width:520px){
+  .history-row{
+    grid-template-columns:56px minmax(0,1.1fr) minmax(52px,.65fr) minmax(52px,.65fr) minmax(58px,.7fr) 74px;
+    gap:5px;font-size:11px;
+  }
+}
+
+
+/* One editable table/card per expense item */
+.project-head{display:none!important}
+.project-list{display:grid;gap:12px}
+.project-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.5fr) minmax(92px,.8fr) minmax(92px,.8fr) minmax(105px,.85fr) minmax(130px,1fr) 64px 64px 36px!important;
+  gap:8px!important;
+  align-items:end!important;
+  padding:12px!important;
+  border:1px solid #e5e5e5!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  margin:0!important;
+}
+.project-cell{min-width:0}
+.project-cell label{
+  display:block;
+  margin:0 0 6px;
+  font-size:11px;
+  font-weight:700;
+  color:#777;
+}
+.project-row .remain{
+  min-height:43px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding:0 10px;
+  border:1px solid #e7e7e7;
+  border-radius:12px;
+  background:#fafafa;
+}
+.project-row .submit-project-btn,
+.project-row .finish-btn{
+  min-height:43px;
+  padding:8px 6px!important;
+}
+.project-row .delete-btn{
+  min-height:43px;
+  align-self:end;
+}
+.project-row .due-date{
+  min-height:43px;
+}
+@media(max-width:760px){
+  .project-row{
+    grid-template-columns:minmax(0,1.3fr) minmax(76px,.8fr) minmax(76px,.8fr)!important;
+  }
+  .project-cell.remaining-cell,
+  .project-cell.due-cell{
+    grid-column:auto;
+  }
+  .project-row .submit-project-btn,
+  .project-row .finish-btn,
+  .project-row .delete-btn{
+    width:100%;
+  }
+}
+
+</style>
+</head>
+<body>
+  <section id="loginPage" class="login-page">
+    <div class="login-card">
+      <div class="logo">LEINGBOX</div>
+      <h1>Login</h1>
+      <p class="sub"></p>
+
+      <label for="username">Email</label>
+      <input id="username" autocomplete="username" placeholder="Email">
+
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
+
+      <button id="loginBtn" class="btn primary">LOGIN</button>
+      <button id="forgotPasswordBtn" type="button" style="display:block;width:100%;margin-top:10px;background:none;border:0;color:#666;text-decoration:underline;cursor:pointer;">忘记密码？</button>
+      <div id="loginError" class="error"></div>
+    </div>
+  </section>
+
+  <section id="financePage" class="app hidden">
+    <header class="topbar">
+      <div>
+        <div class="logo small">LEINGBOX</div>
+        
+      </div>
+      <div class="user-area">
+        <span id="signedUser" class="pill" style="display:none"></span>
+        <button id="logoutBtn" class="btn secondary small-btn">Logout</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="panel">
+        <div class="top-fields">
+          <div class="field wide">
+            <label>名字</label>
+            <input id="personName" placeholder="输入名字">
+          </div>
+
+          <div class="field">
+            <label>总数</label>
+            <div class="money-box">
+              <span>RM</span>
+              <input id="totalAmount" type="number" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+        </div>
+
+        <div class="summary">
+          <div class="summary-item">
+            <span>总数</span>
+            <strong id="totalText">RM 0.00</strong>
+          </div>
+          <div class="summary-item">
+            <span>- 价钱</span>
+            <strong id="deductText">RM 0.00</strong>
+          </div>
+          <div class="summary-item balance">
+            <span>剩多少</span>
+            <strong id="balanceText">RM 0.00</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="page-tabs">
+          <button id="expenseTab" class="page-tab active" type="button">花费</button>
+          <button id="historyTab" class="page-tab" type="button">历史</button>
+        </div>
+
+        <div id="expensePage">
+          <h2 class="expense-page-title" style="margin:18px 0 12px;">花费</h2>
+<div>价格</div>
+            <div>➖价格</div>
+            <div>=剩余</div>
+            <div>提交</div>
+            <div>完成</div>
+            <div></div>
+          </div>
+
+          <div id="projectList" class="project-list"></div>
+          <div id="emptyText" class="empty">还没有项目</div>
+
+          <button id="addProjectBtn" class="btn primary add-btn" type="button" style="width:100%;margin-top:14px;">＋ 新添项目</button>
+        </div>
+
+        <div id="historyPage" class="hidden">
+          <h2 style="margin:18px 0 12px;">历史</h2>
+          <div id="historyList" class="history-list"></div>
+          <div id="historyEmpty" class="empty">还没有历史记录</div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <template id="projectTemplate">
+  <div class="project-row">
+    <div class="project-cell">
+      <label>项目名称</label>
+      <input class="project-name" type="text" placeholder="项目名称">
+    </div>
+
+    <div class="project-cell">
+      <label>价格</label>
+      <input class="project-price" type="number" min="0" step="0.01" placeholder="0.00">
+    </div>
+
+    <div class="project-cell">
+      <label>➖价格</label>
+      <input class="project-deduct" type="number" min="0" step="0.01" placeholder="0.00">
+    </div>
+
+    <div class="project-cell remaining-cell">
+      <label>= 剩余</label>
+      <div class="remain">RM 0.00</div>
+    </div>
+
+    <div class="project-cell due-cell">
+      <label>截止日期</label>
+      <input class="due-date" type="date">
+    </div>
+
+    <button class="submit-project-btn" type="button">提交</button>
+    <button class="finish-btn" type="button">完成</button>
+    <button class="delete-btn" type="button" aria-label="删除">×</button>
+  </div>
+</template>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://plusrybqlfwgmguqhsnx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_nvgOM36tptPGepF-_MouHQ_jeg55fec";
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+const state = { user:null, data:{name:"", total:0, projects:[]} };
+let saveTimer = null;
+
+function formatRM(value){
+  const n = Number(value || 0);
+  return `RM ${n.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+}
+
+async function loadFinance(){
+  const email = state.user.email.toLowerCase();
+
+  const { data: rows, error } = await client
+    .from("leingbox_finance")
+    .select("person_name,total_amount,projects")
+    .eq("username", email)
+    .limit(1);
+
+  if(error) throw error;
+
+  if(!rows || !rows.length){
+    const { error: insertError } = await client
+      .from("leingbox_finance")
+      .insert({
+        username: email,
+        person_name: "",
+        total_amount: 0,
+        projects: []
+      });
+
+    if(insertError) throw insertError;
+    state.data = {name:"", total:0, projects:[]};
+    return;
+  }
+
+  const row = rows[0];
+  state.data = {
+    name: row.person_name || "",
+    total: Number(row.total_amount || 0),
+    projects: Array.isArray(row.projects) ? row.projects : []
+  };
+}
+
+async function saveNow(){
+  const email = state.user.email.toLowerCase();
+
+  const { error } = await client
+    .from("leingbox_finance")
+    .update({
+      person_name: state.data.name || "",
+      total_amount: Number(state.data.total || 0),
+      projects: state.data.projects,
+      updated_at: new Date().toISOString()
+    })
+    .eq("username", email);
+
+  if(error) throw error;
+}
+
+function save(){
+  render();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async()=>{
+    try{
+      await saveNow();
+    }catch(err){
+      console.error(err);
+      alert("云端保存失败，请检查网络后再试。");
+    }
+  },350);
+}
+
+function totals(){
+  const deduct = state.data.projects.reduce((sum,p)=>sum+Number(p.price||0),0);
+  return { deduct, balance:Number(state.data.total||0)-deduct };
+}
+
+
+function todayString(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function formatDateShort(dateStr){
+  if(!dateStr) return "";
+  const [y,m,d] = dateStr.split("-");
+  return `${m}/${d}`;
+}
+
+function showExpensePage(){
+  $("expensePage").classList.remove("hidden");
+  $("historyPage").classList.add("hidden");
+  $("expenseTab").classList.add("active");
+  $("historyTab").classList.remove("active");
+  sessionStorage.setItem("leingbox_view","expense");
+}
+
+function showHistoryPage(){
+  renderHistory();
+  $("expensePage").classList.add("hidden");
+  $("historyPage").classList.remove("hidden");
+  $("expenseTab").classList.remove("active");
+  $("historyTab").classList.add("active");
+  sessionStorage.setItem("leingbox_view","history");
+}
+
+function renderHistory(){
+  const list = $("historyList");
+  const empty = $("historyEmpty");
+  if(!list || !empty) return;
+
+  const completed = state.data.projects
+    .filter(p => p.completed)
+    .slice()
+    .sort((a,b)=>String(b.completed_at||"").localeCompare(String(a.completed_at||"")));
+
+  list.innerHTML = "";
+  empty.style.display = completed.length ? "none" : "block";
+
+  const groups = {};
+  completed.forEach(p=>{
+    const date = p.completed_at || "";
+    const month = date ? date.slice(0,7) : "未注明";
+    (groups[month] ||= []).push(p);
+  });
+
+  Object.keys(groups).sort((a,b)=>b.localeCompare(a)).forEach(month=>{
+    const wrap = document.createElement("div");
+    wrap.className = "history-month";
+    const title = document.createElement("h3");
+    title.textContent = month === "未注明" ? "未注明" : month.replace("-", " / ");
+    wrap.appendChild(title);
+
+    groups[month].forEach(p=>{
+      const row = document.createElement("div");
+      row.className = "history-row";
+      const remaining = Number(p.price||0) - Number(p.deduct||0);
+      row.innerHTML = `
+        <div>${formatDateShort(p.completed_at)}</div>
+        <div>${p.name || "—"}</div>
+        <div>${formatRM(p.price||0)}</div>
+        <div>${formatRM(p.deduct||0)}</div>
+        <div>${formatRM(remaining)}</div>
+        <div>${p.due_date ? "截止 " + formatDateShort(p.due_date) : "—"}</div>
+      `;
+      wrap.appendChild(row);
+    });
+
+    list.appendChild(wrap);
+  });
+}
+
+function render(){
+  $("personName").value = state.data.name || "";
+  $("totalAmount").value = state.data.total || "";
+
+  const t = totals();
+  $("totalText").textContent = formatRM(state.data.total);
+  $("deductText").textContent = formatRM(t.deduct);
+  $("balanceText").textContent = formatRM(t.balance);
+
+  const list = $("projectList");
+  list.innerHTML = "";
+  $("emptyText").style.display = state.data.projects.some(p=>!p.completed) ? "none" : "block";
+
+  state.data.projects.forEach((project,index)=>{
+    if(project.completed) return;
+    const row = $("projectTemplate").content.firstElementChild.cloneNode(true);
+    const name = row.querySelector(".project-name");
+    const price = row.querySelector(".project-price");
+    const deduct = row.querySelector(".project-deduct");
+    const dueDate = row.querySelector(".due-date");
+    const remain = row.querySelector(".remain");
+    const submitBtn = row.querySelector(".submit-project-btn");
+    const finish = row.querySelector(".finish-btn");
+    const del = row.querySelector(".delete-btn");
+
+    name.value = project.name || "";
+    price.value = project.price ?? "";
+    deduct.value = project.deduct ?? "";
+    dueDate.value = project.due_date || "";
+
+    let autoCompleting = false;
+
+    const updateRemain = async ()=>{
+      const priceValue = Number(price.value || project.price || 0);
+      const deductValue = Number(deduct.value || project.deduct || 0);
+      const remaining = priceValue - deductValue;
+
+      remain.textContent = formatRM(remaining);
+      remain.classList.toggle("negative", remaining < 0);
+
+      // 只有已经填写过价格，而且剩余刚好归零时，自动完成并进入历史。
+      if(!autoCompleting && !project.completed && priceValue > 0 && remaining === 0){
+        autoCompleting = true;
+
+        state.data.projects[index].name = name.value;
+        state.data.projects[index].price = priceValue;
+        state.data.projects[index].deduct = deductValue;
+        state.data.projects[index].due_date = dueDate.value || null;
+        state.data.projects[index].completed = true;
+        state.data.projects[index].completed_at = todayString();
+
+        try{
+          await saveNow();
+          render();
+          showHistoryPage();
+        }catch(err){
+          console.error(err);
+          state.data.projects[index].completed = false;
+          state.data.projects[index].completed_at = null;
+          autoCompleting = false;
+          alert("自动完成保存失败，请检查网络后再试。");
+        }
+      }
+    };
+    updateRemain();
+
+    name.addEventListener("input",()=>{
+      // 只在当前输入框修改，不马上写入云端
+    });
+
+    price.addEventListener("input",()=>{
+      project.price = Number(price.value||0);
+      updateRemain();
+    });
+
+    deduct.addEventListener("input",()=>{
+      project.deduct = Number(deduct.value||0);
+      updateRemain();
+    });
+
+    dueDate.addEventListener("change",()=>{
+      project.due_date = dueDate.value || null;
+    });
+
+    submitBtn.addEventListener("click", async ()=>{
+      state.data.projects[index].name = name.value;
+      state.data.projects[index].price = Number(price.value||0);
+      state.data.projects[index].deduct = Number(deduct.value||0);
+      state.data.projects[index].due_date = dueDate.value || null;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "保存中";
+
+      try{
+        await saveNow();
+        submitBtn.textContent = "已提交";
+        setTimeout(()=>{
+          submitBtn.textContent = "提交";
+          submitBtn.disabled = false;
+        },900);
+      }catch(err){
+        console.error(err);
+        submitBtn.textContent = "重试";
+        submitBtn.disabled = false;
+        alert("保存失败，请检查网络后再试。");
+      }
+    });
+
+
+    finish.addEventListener("click", async ()=>{
+      state.data.projects[index].name = name.value;
+      state.data.projects[index].price = Number(price.value||0);
+      state.data.projects[index].deduct = Number(deduct.value||0);
+      state.data.projects[index].due_date = dueDate.value || null;
+      state.data.projects[index].completed = true;
+      state.data.projects[index].completed_at = todayString();
+
+      finish.disabled = true;
+      finish.textContent = "保存中";
+
+      try{
+        await saveNow();
+        render();
+        showHistoryPage();
+      }catch(err){
+        console.error(err);
+        state.data.projects[index].completed = false;
+        state.data.projects[index].completed_at = null;
+        finish.disabled = false;
+        finish.textContent = "完成";
+        alert("保存失败，请检查网络后再试。");
+      }
+    });
+
+    del.addEventListener("click",()=>{
+      if(confirm("确定删除这个项目吗？")){
+        state.data.projects.splice(index,1);
+        save();
+      }
+    });
+
+    list.appendChild(row);
+  });
+}
+
+async function showApp(user){
+  state.user = user;
+  await loadFinance();
+  $("loginPage").classList.add("hidden");
+  $("financePage").classList.remove("hidden");
+  $("password").value = "";
+  $("loginError").textContent = "";
+  render();
+  if(sessionStorage.getItem("leingbox_view")==="history") showHistoryPage();
+  else showExpensePage();
+}
+
+async function doLogin(){
+  const email = $("username").value.trim().toLowerCase();
+  const password = $("password").value;
+  const errorBox = $("loginError");
+
+  if(!email || !password){
+    errorBox.textContent = "请输入 Email 和 Password。";
+    return;
+  }
+
+  errorBox.textContent = "正在登录...";
+
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
+
+  if(error || !data.user){
+    console.error(error);
+    errorBox.textContent = "Email 或 Password 不正确。";
+    return;
+  }
+
+  try{
+    await showApp(data.user);
+  }catch(err){
+    console.error(err);
+    errorBox.textContent = "登录成功，但读取资料失败。";
+  }
+}
+
+$("loginBtn").addEventListener("click", doLogin);
+$("password").addEventListener("keydown", e=>{
+  if(e.key === "Enter") doLogin();
+});
+
+$("forgotPasswordBtn").addEventListener("click", async ()=>{
+  const email = $("username").value.trim().toLowerCase();
+  const errorBox = $("loginError");
+
+  if(!email || !email.includes("@")){
+    errorBox.textContent = "请先输入 Email。";
+    return;
+  }
+
+  errorBox.textContent = "正在发送重设密码邮件...";
+
+  const redirectTo = `${window.location.origin}${window.location.pathname}`;
+  const { error } = await client.auth.resetPasswordForEmail(email,{ redirectTo });
+
+  if(error){
+    console.error(error);
+    const code = error?.code ? ` (${error.code})` : "";
+    errorBox.textContent = `暂时无法发送重设邮件${code}。请稍后再试。`;
+    return;
+  }
+
+  errorBox.textContent = "重设密码邮件已发送，请检查 Email。";
+});
+
+$("logoutBtn").addEventListener("click", async ()=>{
+  await client.auth.signOut();
+  state.user = null;
+  $("financePage").classList.add("hidden");
+  $("loginPage").classList.remove("hidden");
+  $("username").value = "";
+  $("password").value = "";
+});
+
+$("personName").addEventListener("input",e=>{
+  state.data.name = e.target.value;
+  save();
+});
+
+$("totalAmount").addEventListener("input",e=>{
+  state.data.total = Number(e.target.value || 0);
+  save();
+});
+
+$("expenseTab").addEventListener("click", showExpensePage);
+$("historyTab").addEventListener("click", showHistoryPage);
+
+$("addProjectBtn").addEventListener("click",()=>{
+  state.data.projects.push({name:"",price:0,deduct:0,due_date:null,completed:false,completed_at:null});
+  render();
+  setTimeout(()=>{
+    const inputs = document.querySelectorAll(".project-name");
+    inputs[inputs.length-1]?.focus();
+  },0);
+});
+
+client.auth.onAuthStateChange(async(event,session)=>{
+  if(event==="PASSWORD_RECOVERY"){
+    setTimeout(async()=>{
+      const p1 = prompt("请输入新密码（至少 6 个字符）：");
+      if(p1===null) return;
+      if(p1.length<6){ alert("密码至少需要 6 个字符。"); return; }
+
+      const p2 = prompt("请再次输入新密码：");
+      if(p2!==p1){ alert("两次输入的密码不一致。"); return; }
+
+      const { error } = await client.auth.updateUser({password:p1});
+      if(error){
+        console.error(error);
+        alert("密码更新失败，请重新打开邮件链接再试。");
+        return;
+      }
+
+      alert("密码已更新。");
+      window.history.replaceState({},document.title,window.location.pathname);
+    },300);
+  }
+});
+
+(async function init(){
+  const { data:{session} } = await client.auth.getSession();
+  if(session?.user){
+    try{
+      await showApp(session.user);
+    }catch(err){
+      console.error(err);
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
