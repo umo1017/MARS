@@ -190,7 +190,7 @@ input:focus{border-color:#aaa}
 
 .project-head,.project-row{
   display:grid;
-  grid-template-columns:minmax(0,1.5fr) minmax(72px,.9fr) minmax(72px,.9fr) minmax(78px,.9fr) 38px;
+  grid-template-columns:minmax(0,1.5fr) minmax(72px,.9fr) minmax(72px,.9fr) minmax(78px,.9fr) 58px 38px;
   gap:8px;
   align-items:center;
 }
@@ -206,12 +206,37 @@ input:focus{border-color:#aaa}
 .project-row .delete-btn{padding:8px 4px;}
 @media(max-width:520px){
   .project-head,.project-row{
-    grid-template-columns:minmax(0,1.35fr) minmax(58px,.8fr) minmax(58px,.8fr) minmax(68px,.9fr) 32px;
+    grid-template-columns:minmax(0,1.35fr) minmax(58px,.8fr) minmax(58px,.8fr) minmax(68px,.9fr) 46px 30px;
     gap:5px;
   }
   .project-head{font-size:10px;}
   .project-row input{padding:9px 6px;font-size:12px;}
   .project-row .remain{font-size:11px;}
+}
+
+
+.page-tabs{
+  display:flex;gap:8px;margin:0 0 14px 0;
+}
+.page-tab{
+  border:1px solid #ddd;background:#fff;padding:9px 14px;border-radius:999px;font-weight:700;cursor:pointer;
+}
+.page-tab.active{background:#111;color:#fff;border-color:#111}
+.history-list{display:grid;gap:14px}
+.history-month{border:1px solid #e6e6e6;border-radius:16px;padding:14px;background:#fff}
+.history-month h3{margin:0 0 10px;font-size:16px}
+.history-row{
+  display:grid;
+  grid-template-columns:82px minmax(0,1.4fr) minmax(72px,.8fr) minmax(72px,.8fr) minmax(78px,.8fr);
+  gap:8px;align-items:center;padding:9px 0;border-top:1px solid #f0f0f0;font-size:13px;
+}
+.history-row:first-of-type{border-top:0}
+.finish-btn{background:#111;color:#fff;border:0;border-radius:10px;padding:9px 10px;font-weight:700;cursor:pointer}
+@media(max-width:520px){
+  .history-row{
+    grid-template-columns:62px minmax(0,1.2fr) minmax(55px,.7fr) minmax(55px,.7fr) minmax(62px,.8fr);
+    gap:5px;font-size:11px;
+  }
 }
 
 </style>
@@ -291,6 +316,12 @@ input:focus{border-color:#aaa}
 
         <div id="projectList" class="project-list"></div>
         <div id="emptyText" class="empty">还没有项目</div>
+      </div>
+      <div id="historyPage" class="hidden">
+        <h2 style="margin:18px 0 12px;">历史</h2>
+        <div id="historyList" class="history-list"></div>
+        <div id="historyEmpty" class="empty">还没有历史记录</div>
+      </div>
       </section>
     </main>
   </section>
@@ -301,6 +332,7 @@ input:focus{border-color:#aaa}
     <input class="project-price" type="number" min="0" step="0.01" placeholder="0">
     <input class="project-deduct" type="number" min="0" step="0.01" placeholder="0">
     <div class="remain">RM 0.00</div>
+    <button class="finish-btn" type="button">完成</button>
     <button class="delete-btn" type="button" aria-label="删除">×</button>
   </div>
 </template>
@@ -389,6 +421,83 @@ function totals(){
   return { deduct, balance:Number(state.data.total||0)-deduct };
 }
 
+
+function todayString(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function formatDateShort(dateStr){
+  if(!dateStr) return "";
+  const [y,m,d] = dateStr.split("-");
+  return `${m}/${d}`;
+}
+
+function showExpensePage(){
+  $("expensePage").classList.remove("hidden");
+  $("historyPage").classList.add("hidden");
+  $("expenseTab").classList.add("active");
+  $("historyTab").classList.remove("active");
+  sessionStorage.setItem("leingbox_view","expense");
+}
+
+function showHistoryPage(){
+  renderHistory();
+  $("expensePage").classList.add("hidden");
+  $("historyPage").classList.remove("hidden");
+  $("expenseTab").classList.remove("active");
+  $("historyTab").classList.add("active");
+  sessionStorage.setItem("leingbox_view","history");
+}
+
+function renderHistory(){
+  const list = $("historyList");
+  const empty = $("historyEmpty");
+  if(!list || !empty) return;
+
+  const completed = state.data.projects
+    .filter(p => p.completed)
+    .slice()
+    .sort((a,b)=>String(b.completed_at||"").localeCompare(String(a.completed_at||"")));
+
+  list.innerHTML = "";
+  empty.style.display = completed.length ? "none" : "block";
+
+  const groups = {};
+  completed.forEach(p=>{
+    const date = p.completed_at || "";
+    const month = date ? date.slice(0,7) : "未注明";
+    (groups[month] ||= []).push(p);
+  });
+
+  Object.keys(groups).sort((a,b)=>b.localeCompare(a)).forEach(month=>{
+    const wrap = document.createElement("div");
+    wrap.className = "history-month";
+    const title = document.createElement("h3");
+    title.textContent = month === "未注明" ? "未注明" : month.replace("-", " / ");
+    wrap.appendChild(title);
+
+    groups[month].forEach(p=>{
+      const row = document.createElement("div");
+      row.className = "history-row";
+      const remaining = Number(p.price||0) - Number(p.deduct||0);
+      row.innerHTML = `
+        <div>${formatDateShort(p.completed_at)}</div>
+        <div>${p.name || "—"}</div>
+        <div>${formatRM(p.price||0)}</div>
+        <div>${formatRM(p.deduct||0)}</div>
+        <div>${formatRM(remaining)}</div>
+      `;
+      wrap.appendChild(row);
+    });
+
+    list.appendChild(wrap);
+  });
+}
+
 function render(){
   $("personName").value = state.data.name || "";
   $("totalAmount").value = state.data.total || "";
@@ -400,14 +509,16 @@ function render(){
 
   const list = $("projectList");
   list.innerHTML = "";
-  $("emptyText").style.display = state.data.projects.length ? "none" : "block";
+  $("emptyText").style.display = state.data.projects.some(p=>!p.completed) ? "none" : "block";
 
   state.data.projects.forEach((project,index)=>{
+    if(project.completed) return;
     const row = $("projectTemplate").content.firstElementChild.cloneNode(true);
     const name = row.querySelector(".project-name");
     const price = row.querySelector(".project-price");
     const deduct = row.querySelector(".project-deduct");
     const remain = row.querySelector(".remain");
+    const finish = row.querySelector(".finish-btn");
     const del = row.querySelector(".delete-btn");
 
     name.value = project.name || "";
@@ -436,6 +547,20 @@ function render(){
       save();
     });
 
+
+    finish.addEventListener("click", async ()=>{
+      state.data.projects[index].completed = true;
+      state.data.projects[index].completed_at = todayString();
+      render();
+      try{
+        await saveNow();
+        showHistoryPage();
+      }catch(err){
+        console.error(err);
+        alert("保存失败，请检查网络后再试。");
+      }
+    });
+
     del.addEventListener("click",()=>{
       if(confirm("确定删除这个项目吗？")){
         state.data.projects.splice(index,1);
@@ -455,6 +580,8 @@ async function showApp(user){
   $("password").value = "";
   $("loginError").textContent = "";
   render();
+  if(sessionStorage.getItem("leingbox_view")==="history") showHistoryPage();
+  else showExpensePage();
 }
 
 async function doLogin(){
@@ -533,8 +660,11 @@ $("totalAmount").addEventListener("input",e=>{
   save();
 });
 
+$("expenseTab").addEventListener("click", showExpensePage);
+$("historyTab").addEventListener("click", showHistoryPage);
+
 $("addProjectBtn").addEventListener("click",()=>{
-  state.data.projects.push({name:"",price:0,deduct:0});
+  state.data.projects.push({name:"",price:0,deduct:0,completed:false,completed_at:null});
   save();
   setTimeout(()=>{
     const inputs = document.querySelectorAll(".project-name");
