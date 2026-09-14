@@ -203,6 +203,7 @@ input:focus{border-color:#aaa}
       <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
 
       <button id="loginBtn" class="btn primary">LOGIN</button>
+      <button id="forgotPasswordBtn" type="button" style="display:block;width:100%;margin-top:10px;background:none;border:0;color:#666;text-decoration:underline;cursor:pointer;">忘记密码？</button>
       <div id="loginError" class="error"></div>
     </div>
   </section>
@@ -461,6 +462,59 @@ async function doLogin(){
 }
 
 $("loginBtn").addEventListener("click", doLogin);
+
+$("forgotPasswordBtn").addEventListener("click", async ()=>{
+  const username = $("username").value.trim().toUpperCase();
+  const error = $("loginError");
+
+  if(!username){
+    error.textContent = "请先输入 Username。";
+    return;
+  }
+
+  try{
+    const rows = await api(
+      `leingbox_accounts?username=eq.${encodeURIComponent(username)}&select=username`
+    );
+
+    if(!rows?.length){
+      error.textContent = "找不到这个 Username。";
+      return;
+    }
+
+    const newPassword = prompt("请输入新密码（至少 6 个字符）：");
+    if(newPassword === null) return;
+
+    if(newPassword.length < 6){
+      error.textContent = "新密码至少需要 6 个字符。";
+      return;
+    }
+
+    const confirmPassword = prompt("请再次输入新密码：");
+    if(confirmPassword === null) return;
+
+    if(newPassword !== confirmPassword){
+      error.textContent = "两次输入的密码不一致。";
+      return;
+    }
+
+    await api(
+      `leingbox_accounts?username=eq.${encodeURIComponent(username)}`,
+      {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ password: newPassword })
+      }
+    );
+
+    error.textContent = "密码已更新，请使用新密码登录。";
+    $("password").value = "";
+  }catch(err){
+    console.error(err);
+    error.textContent = "暂时无法重设密码，请稍后再试。";
+  }
+});
+
 $("password").addEventListener("keydown", e=>{
   if(e.key === "Enter") doLogin();
 });
