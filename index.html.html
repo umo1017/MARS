@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leingbox Finance</title>
+  <style>
+*{box-sizing:border-box}
+:root{
+  --bg:#f4f5f7;
+  --card:#fff;
+  --text:#111;
+  --muted:#777;
+  --line:#e7e7e7;
+  --dark:#111;
+}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.hidden{display:none!important}
+.login-page{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:linear-gradient(180deg,#fafafa,#f1f2f4);
+}
+.login-card{
+  width:min(410px,100%);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:32px;
+  box-shadow:0 18px 50px rgba(0,0,0,.08);
+}
+.logo{
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.22em;
+}
+.logo.small{font-size:11px;margin-bottom:4px}
+h1{margin:12px 0 5px;font-size:30px}
+h2,h3{margin:0}
+.sub{margin:0 0 24px;color:var(--muted)}
+label{
+  display:block;
+  font-size:13px;
+  font-weight:750;
+  margin:16px 0 8px;
+}
+input{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:13px 14px;
+  font-size:16px;
+  outline:none;
+  background:#fff;
+}
+input:focus{border-color:#aaa}
+.btn{
+  border:0;
+  border-radius:14px;
+  padding:12px 16px;
+  font-weight:800;
+  cursor:pointer;
+}
+.primary{background:var(--dark);color:#fff}
+.secondary{background:#efefef;color:#222}
+.login-card .primary{width:100%;margin-top:22px}
+.error{
+  min-height:18px;
+  margin-top:10px;
+  font-size:13px;
+  color:#b42318;
+}
+.topbar{
+  height:78px;
+  padding:0 max(18px,calc((100vw - 1000px)/2));
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.user-area{display:flex;align-items:center;gap:10px}
+.pill{
+  padding:8px 11px;
+  border-radius:999px;
+  background:#f0f0f0;
+  font-size:12px;
+  font-weight:800;
+}
+.small-btn{padding:9px 12px}
+.container{
+  width:min(1000px,calc(100% - 28px));
+  margin:24px auto 48px;
+  display:grid;
+  gap:18px;
+}
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px;
+}
+.top-fields{
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:14px;
+}
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:20px;
+}
+.summary-item{
+  padding:18px;
+  border-radius:16px;
+  background:#f7f7f7;
+}
+.summary-item span{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:8px;
+}
+.summary-item strong{font-size:22px}
+.summary-item.balance{
+  background:#111;
+  color:#fff;
+}
+.summary-item.balance span{color:#ccc}
+.money-box{position:relative}
+.money-box span{
+  position:absolute;
+  left:13px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:13px;
+  color:#777;
+  z-index:1;
+}
+.money-box input{padding-left:42px}
+.panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
+}
+.panel-head p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+.add-btn{white-space:nowrap}
+.project-list{display:grid;gap:10px}
+.project-row{
+  display:grid;
+  grid-template-columns:1fr 220px auto;
+  gap:10px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fafafa;
+}
+.delete-btn{background:#eee;color:#555}
+.empty{
+  padding:28px 10px;
+  text-align:center;
+  border:1px dashed #d7d7d7;
+  border-radius:16px;
+  color:#888;
+}
+@media(max-width:700px){
+  .top-fields,.summary,.project-row{grid-template-columns:1fr}
+  .panel-head{align-items:stretch;flex-direction:column}
+  .add-btn{width:100%}
+  .topbar{padding:0 14px}
+}
+
+</style>
+</head>
+<body>
+  <section id="loginPage" class="login-page">
+    <div class="login-card">
+      <div class="logo">LEINGBOX</div>
+      <h1>Login</h1>
+      <p class="sub"></p>
+
+      <label for="username">Email</label>
+      <input id="username" autocomplete="username" placeholder="Email">
+
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
+
+      <button id="loginBtn" class="btn primary">LOGIN</button>
+      <button id="forgotPasswordBtn" type="button" style="display:block;width:100%;margin-top:10px;background:none;border:0;color:#666;text-decoration:underline;cursor:pointer;">忘记密码？</button>
+      <div id="loginError" class="error"></div>
+
+      <div id="otpBox" class="hidden" style="margin-top:16px;">
+        <label for="otpCode">Gmail 验证码</label>
+        <input id="otpCode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="输入 Email 收到的验证码">
+        <button id="verifyOtpBtn" class="btn primary" type="button" style="width:100%;margin-top:12px;">VERIFY</button>
+        <button id="resendOtpBtn" type="button" style="display:block;width:100%;margin-top:8px;background:none;border:0;color:#666;text-decoration:underline;cursor:pointer;">重新发送验证码</button>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="financePage" class="app hidden">
+    <header class="topbar">
+      <div>
+        <div class="logo small">LEINGBOX</div>
+        
+      </div>
+      <div class="user-area">
+        <span id="signedUser" class="pill" style="display:none"></span>
+        <button id="logoutBtn" class="btn secondary small-btn">Logout</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="panel">
+        <div class="top-fields">
+          <div class="field wide">
+            <label>名字</label>
+            <input id="personName" placeholder="输入名字">
+          </div>
+
+          <div class="field">
+            <label>总数</label>
+            <div class="money-box">
+              <span>RM</span>
+              <input id="totalAmount" type="number" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+        </div>
+
+        <div class="summary">
+          <div class="summary-item">
+            <span>总数</span>
+            <strong id="totalText">RM 0.00</strong>
+          </div>
+          <div class="summary-item">
+            <span>- 价钱</span>
+            <strong id="deductText">RM 0.00</strong>
+          </div>
+          <div class="summary-item balance">
+            <span>剩多少</span>
+            <strong id="balanceText">RM 0.00</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h3>项目</h3>
+            <p>每次新增、修改或删除后都会自动重新计算。</p>
+          </div>
+          <button id="addProjectBtn" class="btn primary add-btn">＋ 添加项目</button>
+        </div>
+
+        <div id="projectList" class="project-list"></div>
+        <div id="emptyText" class="empty">还没有项目</div>
+      </section>
+    </main>
+  </section>
+
+  <template id="projectTemplate">
+    <div class="project-row">
+      <input class="project-name" placeholder="项目名字">
+      <div class="money-box">
+        <span>RM</span>
+        <input class="project-price" type="number" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <button class="btn delete-btn">删除</button>
+    </div>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://plusrybqlfwgmguqhsnx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_nvgOM36tptPGepF-_MouHQ_jeg55fec";
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+const state = { user:null, pendingEmail:"", data:{name:"",total:0,projects:[]} };
+let saveTimer = null;
+
+function formatRM(value){
+  const n = Number(value || 0);
+  return `RM ${n.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+}
+
+async function firstLoginVerified(userId){
+  const { data, error } = await client
+    .from("leingbox_user_security")
+    .select("first_login_verified")
+    .eq("user_id", userId)
+    .single();
+
+  if(error) throw error;
+  return !!data?.first_login_verified;
+}
+
+async function sendFirstLoginOtp(email){
+  state.pendingEmail = email.toLowerCase();
+
+  await client.auth.signOut();
+
+  const { error } = await client.auth.signInWithOtp({
+    email: state.pendingEmail,
+    options: { shouldCreateUser: false }
+  });
+
+  if(error) throw error;
+
+  $("otpBox").classList.remove("hidden");
+  $("password").value = "";
+  $("password").disabled = true;
+  $("loginBtn").disabled = true;
+  $("loginError").textContent = "第一次登录，请输入 Gmail 收到的验证码。";
+}
+
+async function verifyFirstLoginOtp(){
+  const token = $("otpCode").value.trim();
+  const errorBox = $("loginError");
+
+  if(!state.pendingEmail){
+    errorBox.textContent = "请重新输入 Email 和 Password 登录。";
+    return;
+  }
+
+  if(!token){
+    errorBox.textContent = "请输入验证码。";
+    return;
+  }
+
+  errorBox.textContent = "正在验证...";
+
+  const { data, error } = await client.auth.verifyOtp({
+    email: state.pendingEmail,
+    token,
+    type: "email"
+  });
+
+  if(error){
+    console.error(error);
+    errorBox.textContent = "验证码不正确或已过期。";
+    return;
+  }
+
+  const { error: markError } = await client.rpc("mark_leingbox_first_login_verified");
+
+  if(markError){
+    console.error(markError);
+    errorBox.textContent = "验证码成功，但无法完成首次验证。";
+    return;
+  }
+
+  $("otpBox").classList.add("hidden");
+  $("password").disabled = false;
+  $("loginBtn").disabled = false;
+  $("otpCode").value = "";
+
+  try{
+    await showApp(data.user);
+  }catch(err){
+    console.error(err);
+    errorBox.textContent = "验证成功，但读取资料失败。";
+  }
+}
+
+async function load(){
+  const email = state.user.email.toLowerCase();
+
+  let { data: rows, error } = await client
+    .from("leingbox_finance")
+    .select("person_name,total_amount,projects")
+    .eq("username", email)
+    .limit(1);
+
+  if(error) throw error;
+
+  if(!rows || !rows.length){
+    const { error: insertError } = await client
+      .from("leingbox_finance")
+      .insert({username:email,person_name:"",total_amount:0,projects:[]});
+    if(insertError) throw insertError;
+    state.data = {name:"",total:0,projects:[]};
+    return;
+  }
+
+  const row = rows[0];
+  state.data = {
+    name: row.person_name || "",
+    total: Number(row.total_amount || 0),
+    projects: Array.isArray(row.projects) ? row.projects : []
+  };
+}
+
+async function saveNow(){
+  const email = state.user.email.toLowerCase();
+  const { error } = await client
+    .from("leingbox_finance")
+    .update({
+      person_name: state.data.name || "",
+      total_amount: Number(state.data.total || 0),
+      projects: state.data.projects,
+      updated_at: new Date().toISOString()
+    })
+    .eq("username", email);
+
+  if(error) throw error;
+}
+
+function save(){
+  render();
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{ await saveNow(); }
+    catch(err){ console.error(err); alert("云端保存失败，请检查网络后再试。"); }
+  },350);
+}
+
+function totals(){
+  const deduct=state.data.projects.reduce((sum,p)=>sum+Number(p.price||0),0);
+  return {deduct,balance:Number(state.data.total||0)-deduct};
+}
+
+function render(){
+  $("personName").value=state.data.name||"";
+  $("totalAmount").value=state.data.total||"";
+
+  const t=totals();
+  $("totalText").textContent=formatRM(state.data.total);
+  $("deductText").textContent=formatRM(t.deduct);
+  $("balanceText").textContent=formatRM(t.balance);
+
+  const list=$("projectList");
+  list.innerHTML="";
+  $("emptyText").style.display=state.data.projects.length?"none":"block";
+
+  state.data.projects.forEach((project,index)=>{
+    const row=$("projectTemplate").content.firstElementChild.cloneNode(true);
+    const name=row.querySelector(".project-name");
+    const price=row.querySelector(".project-price");
+    const del=row.querySelector(".delete-btn");
+
+    name.value=project.name||"";
+    price.value=project.price||"";
+
+    name.addEventListener("input",()=>{
+      state.data.projects[index].name=name.value;
+      save();
+    });
+
+    price.addEventListener("input",()=>{
+      state.data.projects[index].price=Number(price.value||0);
+      save();
+    });
+
+    del.addEventListener("click",()=>{
+      if(confirm("确定删除这个项目吗？")){
+        state.data.projects.splice(index,1);
+        save();
+      }
+    });
+
+    list.appendChild(row);
+  });
+}
+
+async function showApp(user){
+  state.user=user;
+  await load();
+  $("loginPage").classList.add("hidden");
+  $("financePage").classList.remove("hidden");
+  $("password").value="";
+  $("loginError").textContent="";
+  render();
+}
+
+async function doLogin(){
+  const email=$("username").value.trim().toLowerCase();
+  const password=$("password").value;
+  const errorBox=$("loginError");
+
+  if(!email||!password){
+    errorBox.textContent="请输入 Email 和 Password。";
+    return;
+  }
+
+  errorBox.textContent="正在登录...";
+
+  const {data,error}=await client.auth.signInWithPassword({email,password});
+
+  if(error){
+    errorBox.textContent="Email 或 Password 不正确。";
+    return;
+  }
+
+  try{
+    const verified=await firstLoginVerified(data.user.id);
+
+    if(!verified){
+      await sendFirstLoginOtp(email);
+      return;
+    }
+
+    await showApp(data.user);
+  }catch(err){
+    console.error(err);
+    errorBox.textContent="登录成功，但读取验证状态失败。";
+  }
+}
+
+$("loginBtn").addEventListener("click",doLogin);
+$("password").addEventListener("keydown",e=>{
+  if(e.key==="Enter") doLogin();
+});
+
+$("verifyOtpBtn").addEventListener("click",verifyFirstLoginOtp);
+$("otpCode").addEventListener("keydown",e=>{
+  if(e.key==="Enter") verifyFirstLoginOtp();
+});
+
+$("resendOtpBtn").addEventListener("click",async()=>{
+  const errorBox=$("loginError");
+  if(!state.pendingEmail){
+    errorBox.textContent="请重新登录。";
+    return;
+  }
+  errorBox.textContent="正在重新发送...";
+  const {error}=await client.auth.signInWithOtp({
+    email:state.pendingEmail,
+    options:{shouldCreateUser:false}
+  });
+  errorBox.textContent=error?"发送失败，请稍后再试。":"验证码已重新发送。";
+});
+
+$("forgotPasswordBtn").addEventListener("click",async()=>{
+  const email=$("username").value.trim().toLowerCase();
+  const errorBox=$("loginError");
+
+  if(!email||!email.includes("@")){
+    errorBox.textContent="请先输入 Email。";
+    return;
+  }
+
+  errorBox.textContent="正在发送重设密码邮件...";
+  const redirectTo=window.location.origin+window.location.pathname;
+
+  const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo});
+  errorBox.textContent=error
+    ?"暂时无法发送重设邮件，请稍后再试。"
+    :"重设密码邮件已发送，请检查 Email。";
+});
+
+$("logoutBtn").addEventListener("click",async()=>{
+  await client.auth.signOut();
+  state.user=null;
+  state.pendingEmail="";
+  $("financePage").classList.add("hidden");
+  $("loginPage").classList.remove("hidden");
+  $("username").value="";
+  $("password").value="";
+  $("password").disabled=false;
+  $("loginBtn").disabled=false;
+  $("otpBox").classList.add("hidden");
+});
+
+$("personName").addEventListener("input",e=>{
+  state.data.name=e.target.value;
+  save();
+});
+
+$("totalAmount").addEventListener("input",e=>{
+  state.data.total=Number(e.target.value||0);
+  save();
+});
+
+$("addProjectBtn").addEventListener("click",()=>{
+  state.data.projects.push({name:"",price:0});
+  save();
+  setTimeout(()=>{
+    const inputs=document.querySelectorAll(".project-name");
+    inputs[inputs.length-1]?.focus();
+  },0);
+});
+
+client.auth.onAuthStateChange(async(event,session)=>{
+  if(event==="PASSWORD_RECOVERY"){
+    setTimeout(async()=>{
+      const p1=prompt("请输入新密码（至少 6 个字符）：");
+      if(p1===null)return;
+      if(p1.length<6){alert("密码至少需要 6 个字符。");return;}
+
+      const p2=prompt("请再次输入新密码：");
+      if(p2!==p1){alert("两次输入的密码不一致。");return;}
+
+      const {error}=await client.auth.updateUser({password:p1});
+      if(error){alert("密码更新失败，请重新打开邮件链接再试。");return;}
+
+      alert("密码已更新。");
+      window.history.replaceState({},document.title,window.location.pathname);
+    },300);
+  }
+});
+
+(async function init(){
+  const {data:{session}}=await client.auth.getSession();
+  if(!session?.user)return;
+
+  try{
+    const verified=await firstLoginVerified(session.user.id);
+    if(verified) await showApp(session.user);
+    else await client.auth.signOut();
+  }catch(err){
+    console.error(err);
+  }
+})();
+</script>
+</body>
+</html>
