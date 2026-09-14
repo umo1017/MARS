@@ -194,23 +194,18 @@ input:focus{border-color:#aaa}
     <div class="login-card">
       <div class="logo">LEINGBOX</div>
       <h1>Login</h1>
+      <p class="sub"></p>
 
-      <div id="googleStep">
-        <button id="googleLoginBtn" class="btn primary" type="button" style="width:100%;margin-top:24px;">
-          Continue with Google
-        </button>
-      </div>
+      <label for="username">Email</label>
+      <input id="username" autocomplete="username" placeholder="Email">
 
-      <div id="securityStep" class="hidden" style="margin-top:22px;">
-        <label for="securityPassword">Security Password</label>
-        <input id="securityPassword" type="password" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="请输入保险密码">
-        <button id="securityLoginBtn" class="btn primary" type="button" style="width:100%;margin-top:14px;">
-          ENTER
-        </button>
-      </div>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
 
+      <button id="loginBtn" class="btn primary">LOGIN</button>
+      <button id="forgotPasswordBtn" type="button" style="display:block;width:100%;margin-top:10px;background:none;border:0;color:#666;text-decoration:underline;cursor:pointer;">忘记密码？</button>
       <div id="loginError" class="error"></div>
-</div>
+    </div>
   </section>
 
   <section id="financePage" class="app hidden">
@@ -294,7 +289,6 @@ const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 const state = { user:null, data:{name:"", total:0, projects:[]} };
 let saveTimer = null;
-let securityVerified = sessionStorage.getItem("leingbox_security_verified") === "1";
 
 function formatRM(value){
   const n = Number(value || 0);
@@ -315,10 +309,15 @@ async function loadFinance(){
   if(!rows || !rows.length){
     const { error: insertError } = await client
       .from("leingbox_finance")
-      .insert({ username:email, person_name:"", total_amount:0, projects:[] });
+      .insert({
+        username: email,
+        person_name: "",
+        total_amount: 0,
+        projects: []
+      });
 
     if(insertError) throw insertError;
-    state.data = {name:"",total:0,projects:[]};
+    state.data = {name:"", total:0, projects:[]};
     return;
   }
 
@@ -350,8 +349,9 @@ function save(){
   render();
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async()=>{
-    try{ await saveNow(); }
-    catch(err){
+    try{
+      await saveNow();
+    }catch(err){
       console.error(err);
       alert("云端保存失败，请检查网络后再试。");
     }
@@ -411,91 +411,75 @@ async function showApp(user){
   await loadFinance();
   $("loginPage").classList.add("hidden");
   $("financePage").classList.remove("hidden");
+  $("password").value = "";
   $("loginError").textContent = "";
   render();
 }
 
-function showSecurityStep(){
-  $("googleStep").classList.add("hidden");
-  $("securityStep").classList.remove("hidden");
-  $("loginError").textContent = "";
-  setTimeout(()=>$("securityPassword")?.focus(),50);
-}
-
-$("googleLoginBtn").addEventListener("click", async ()=>{
-  $("loginError").textContent = "正在打开 Google 登录...";
-
-  const redirectTo = `${window.location.origin}${window.location.pathname}`;
-
-  const { error } = await client.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo }
-  });
-
-  if(error){
-    console.error(error);
-    $("loginError").textContent = "Google 登录暂时无法使用。";
-  }
-});
-
-$("securityLoginBtn").addEventListener("click", async ()=>{
-  const password = $("securityPassword").value;
+async function doLogin(){
+  const email = $("username").value.trim().toLowerCase();
+  const password = $("password").value;
   const errorBox = $("loginError");
 
-  if(!password){
-    errorBox.textContent = "请输入 Security Password。";
+  if(!email || !password){
+    errorBox.textContent = "请输入 Email 和 Password。";
     return;
   }
 
-  errorBox.textContent = "正在验证...";
+  errorBox.textContent = "正在登录...";
 
-  const { data, error } = await client.rpc("verify_leingbox_security_password", {
-    p_password: password
-  });
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
 
-  if(error){
+  if(error || !data.user){
     console.error(error);
-    errorBox.textContent = "保险密码验证失败。";
+    errorBox.textContent = "Email 或 Password 不正确。";
     return;
   }
 
-  if(data !== true){
-    errorBox.textContent = "Security Password 不正确。";
-    $("securityPassword").value = "";
-    return;
-  }
-
-  securityVerified = true;
-  sessionStorage.setItem("leingbox_security_verified","1");
-  $("securityPassword").value = "";
-
-  const { data:{ user } } = await client.auth.getUser();
-  if(!user){
-    errorBox.textContent = "Google 登录已失效，请重新登录。";
-    return;
-  }
-
-  try{ await showApp(user); }
-  catch(err){
+  try{
+    await showApp(data.user);
+  }catch(err){
     console.error(err);
     errorBox.textContent = "登录成功，但读取资料失败。";
   }
+}
+
+$("loginBtn").addEventListener("click", doLogin);
+$("password").addEventListener("keydown", e=>{
+  if(e.key === "Enter") doLogin();
 });
 
-$("securityPassword").addEventListener("keydown", e=>{
-  if(e.key === "Enter") $("securityLoginBtn").click();
+$("forgotPasswordBtn").addEventListener("click", async ()=>{
+  const email = $("username").value.trim().toLowerCase();
+  const errorBox = $("loginError");
+
+  if(!email || !email.includes("@")){
+    errorBox.textContent = "请先输入 Email。";
+    return;
+  }
+
+  errorBox.textContent = "正在发送重设密码邮件...";
+
+  const redirectTo = `${window.location.origin}${window.location.pathname}`;
+  const { error } = await client.auth.resetPasswordForEmail(email,{ redirectTo });
+
+  if(error){
+    console.error(error);
+    const code = error?.code ? ` (${error.code})` : "";
+    errorBox.textContent = `暂时无法发送重设邮件${code}。请稍后再试。`;
+    return;
+  }
+
+  errorBox.textContent = "重设密码邮件已发送，请检查 Email。";
 });
 
 $("logoutBtn").addEventListener("click", async ()=>{
   await client.auth.signOut();
-  sessionStorage.removeItem("leingbox_security_verified");
-  securityVerified = false;
   state.user = null;
-
   $("financePage").classList.add("hidden");
   $("loginPage").classList.remove("hidden");
-  $("securityStep").classList.add("hidden");
-  $("googleStep").classList.remove("hidden");
+  $("username").value = "";
+  $("password").value = "";
 });
 
 $("personName").addEventListener("input",e=>{
@@ -511,29 +495,43 @@ $("totalAmount").addEventListener("input",e=>{
 $("addProjectBtn").addEventListener("click",()=>{
   state.data.projects.push({name:"",price:0});
   save();
-
   setTimeout(()=>{
     const inputs = document.querySelectorAll(".project-name");
     inputs[inputs.length-1]?.focus();
   },0);
 });
 
-(async function init(){
-  const { data:{ session } } = await client.auth.getSession();
+client.auth.onAuthStateChange(async(event,session)=>{
+  if(event==="PASSWORD_RECOVERY"){
+    setTimeout(async()=>{
+      const p1 = prompt("请输入新密码（至少 6 个字符）：");
+      if(p1===null) return;
+      if(p1.length<6){ alert("密码至少需要 6 个字符。"); return; }
 
-  if(!session?.user) return;
+      const p2 = prompt("请再次输入新密码：");
+      if(p2!==p1){ alert("两次输入的密码不一致。"); return; }
 
-  state.user = session.user;
+      const { error } = await client.auth.updateUser({password:p1});
+      if(error){
+        console.error(error);
+        alert("密码更新失败，请重新打开邮件链接再试。");
+        return;
+      }
 
-  if(!securityVerified){
-    showSecurityStep();
-    return;
+      alert("密码已更新。");
+      window.history.replaceState({},document.title,window.location.pathname);
+    },300);
   }
+});
 
-  try{ await showApp(session.user); }
-  catch(err){
-    console.error(err);
-    $("loginError").textContent = "读取资料失败。";
+(async function init(){
+  const { data:{session} } = await client.auth.getSession();
+  if(session?.user){
+    try{
+      await showApp(session.user);
+    }catch(err){
+      console.error(err);
+    }
   }
 })();
 </script>
