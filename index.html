@@ -187,6 +187,33 @@ input:focus{border-color:#aaa}
   .topbar{padding:0 14px}
 }
 
+
+.project-head,.project-row{
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(72px,.9fr) minmax(72px,.9fr) minmax(78px,.9fr) 38px;
+  gap:8px;
+  align-items:center;
+}
+.project-head{
+  font-size:12px;
+  font-weight:700;
+  opacity:.7;
+  margin:8px 0;
+}
+.project-row{margin-bottom:8px;}
+.project-row input{width:100%;min-width:0;box-sizing:border-box;}
+.project-row .remain{font-weight:700;text-align:right;white-space:nowrap;font-size:13px;}
+.project-row .delete-btn{padding:8px 4px;}
+@media(max-width:520px){
+  .project-head,.project-row{
+    grid-template-columns:minmax(0,1.35fr) minmax(58px,.8fr) minmax(58px,.8fr) minmax(68px,.9fr) 32px;
+    gap:5px;
+  }
+  .project-head{font-size:10px;}
+  .project-row input{padding:9px 6px;font-size:12px;}
+  .project-row .remain{font-size:11px;}
+}
+
 </style>
 </head>
 <body>
@@ -259,7 +286,7 @@ input:focus{border-color:#aaa}
             <h3>项目</h3>
             <p>每次新增、修改或删除后都会自动重新计算。</p>
           </div>
-          <button id="addProjectBtn" class="btn primary add-btn">＋ 添加项目</button>
+          <button id="addProjectBtn" class="btn primary add-btn">＋ 新添项目</button>
         </div>
 
         <div id="projectList" class="project-list"></div>
@@ -269,15 +296,14 @@ input:focus{border-color:#aaa}
   </section>
 
   <template id="projectTemplate">
-    <div class="project-row">
-      <input class="project-name" placeholder="项目名字">
-      <div class="money-box">
-        <span>RM</span>
-        <input class="project-price" type="number" min="0" step="0.01" placeholder="0.00">
-      </div>
-      <button class="btn delete-btn">删除</button>
-    </div>
-  </template>
+  <div class="project-row">
+    <input class="project-name" type="text" placeholder="项目">
+    <input class="project-price" type="number" min="0" step="0.01" placeholder="0">
+    <input class="project-deduct" type="number" min="0" step="0.01" placeholder="0">
+    <div class="remain">RM 0.00</div>
+    <button class="delete-btn" type="button" aria-label="删除">×</button>
+  </div>
+</template>
 
   
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -380,10 +406,18 @@ function render(){
     const row = $("projectTemplate").content.firstElementChild.cloneNode(true);
     const name = row.querySelector(".project-name");
     const price = row.querySelector(".project-price");
+    const deduct = row.querySelector(".project-deduct");
+    const remain = row.querySelector(".remain");
     const del = row.querySelector(".delete-btn");
 
     name.value = project.name || "";
-    price.value = project.price || "";
+    price.value = project.price ?? "";
+    deduct.value = project.deduct ?? "";
+
+    const updateRemain = ()=>{
+      remain.textContent = formatRM(Number(project.price||0) - Number(project.deduct||0));
+    };
+    updateRemain();
 
     name.addEventListener("input",()=>{
       state.data.projects[index].name = name.value;
@@ -391,7 +425,14 @@ function render(){
     });
 
     price.addEventListener("input",()=>{
-      state.data.projects[index].price = Number(price.value || 0);
+      state.data.projects[index].price = Number(price.value||0);
+      updateRemain();
+      save();
+    });
+
+    deduct.addEventListener("input",()=>{
+      state.data.projects[index].deduct = Number(deduct.value||0);
+      updateRemain();
       save();
     });
 
@@ -493,7 +534,7 @@ $("totalAmount").addEventListener("input",e=>{
 });
 
 $("addProjectBtn").addEventListener("click",()=>{
-  state.data.projects.push({name:"",price:0});
+  state.data.projects.push({name:"",price:0,deduct:0});
   save();
   setTimeout(()=>{
     const inputs = document.querySelectorAll(".project-name");
