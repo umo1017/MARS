@@ -1,0 +1,2790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes">
+  <title>Leingbox Finance</title>
+  <style>
+*{box-sizing:border-box}
+:root{
+  --bg:#f4f5f7;
+  --card:#fff;
+  --text:#111;
+  --muted:#777;
+  --line:#e7e7e7;
+  --dark:#111;
+}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.hidden{display:none!important}
+.login-page{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+  background:linear-gradient(180deg,#fafafa,#f1f2f4);
+}
+.login-card{
+  width:min(410px,100%);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:32px;
+  box-shadow:0 18px 50px rgba(0,0,0,.08);
+}
+.logo{
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.22em;
+}
+.logo.small{font-size:11px;margin-bottom:4px}
+h1{margin:12px 0 5px;font-size:30px}
+h2,h3{margin:0}
+.sub{margin:0 0 24px;color:var(--muted)}
+label{
+  display:block;
+  font-size:13px;
+  font-weight:750;
+  margin:16px 0 8px;
+}
+input{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:13px 14px;
+  font-size:16px;
+  outline:none;
+  background:#fff;
+}
+input:focus{border-color:#aaa}
+.btn{
+  border:0;
+  border-radius:14px;
+  padding:12px 16px;
+  font-weight:800;
+  cursor:pointer;
+}
+.primary{background:var(--dark);color:#fff}
+.secondary{background:#efefef;color:#222}
+.login-card .primary{width:100%;margin-top:22px}
+.error{
+  min-height:18px;
+  margin-top:10px;
+  font-size:13px;
+  color:#b42318;
+}
+.topbar{
+  height:78px;
+  padding:0 max(18px,calc((100vw - 1000px)/2));
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.user-area{display:flex;align-items:center;gap:10px}
+.pill{
+  padding:8px 11px;
+  border-radius:999px;
+  background:#f0f0f0;
+  font-size:12px;
+  font-weight:800;
+}
+.small-btn{padding:9px 12px}
+.container{
+  width:min(1000px,calc(100% - 28px));
+  margin:24px auto 48px;
+  display:grid;
+  gap:18px;
+}
+.panel{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px;
+}
+.top-fields{
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:14px;
+}
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:20px;
+}
+.summary-item{
+  padding:18px;
+  border-radius:16px;
+  background:#f7f7f7;
+}
+.summary-item span{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:8px;
+}
+.summary-item strong{font-size:22px}
+.summary-item.balance{
+  background:#111;
+  color:#fff;
+}
+.summary-item.balance span{color:#ccc}
+.money-box{position:relative}
+.money-box span{
+  position:absolute;
+  left:13px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:13px;
+  color:#777;
+  z-index:1;
+}
+.money-box input{padding-left:42px}
+.panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
+}
+.panel-head p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+.add-btn{white-space:nowrap}
+.project-list{display:grid;gap:10px}
+.project-row{
+  display:grid;
+  grid-template-columns:1fr 220px auto;
+  gap:10px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fafafa;
+}
+.delete-btn{background:#eee;color:#555}
+.empty{
+  padding:28px 10px;
+  text-align:center;
+  border:1px dashed #d7d7d7;
+  border-radius:16px;
+  color:#888;
+}
+@media(max-width:700px){
+  .top-fields,.summary,.project-row{grid-template-columns:1fr}
+  .panel-head{align-items:stretch;flex-direction:column}
+  .add-btn{width:100%}
+  .topbar{padding:0 14px}
+}
+
+.project-head,.project-row{
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(72px,.9fr) minmax(72px,.9fr) minmax(78px,.9fr) 58px 58px 38px;
+  gap:8px;
+  align-items:center;
+}
+.project-head{
+  font-size:12px;
+  font-weight:700;
+  opacity:.7;
+  margin:8px 0;
+}
+.project-row{margin-bottom:8px;}
+.project-row input{width:100%;min-width:0;box-sizing:border-box;}
+.project-row .remain{font-weight:700;text-align:right;white-space:nowrap;font-size:13px;}
+.project-row .remain.negative{color:#d32f2f;}
+.project-row .delete-btn{padding:8px 4px;}
+@media(max-width:520px){
+  .project-head,.project-row{
+    grid-template-columns:minmax(0,1.35fr) minmax(58px,.8fr) minmax(58px,.8fr) minmax(68px,.9fr) 46px 46px 30px;
+    gap:5px;
+  }
+  .project-head{font-size:10px;}
+  .project-row input{padding:9px 6px;font-size:12px;}
+  .project-row .remain{font-size:11px;}
+}
+
+.page-tabs{
+  display:flex;gap:8px;margin:0 0 14px 0;
+}
+.page-tab{
+  border:1px solid #ddd;background:#fff;padding:9px 14px;border-radius:999px;font-weight:700;cursor:pointer;
+}
+.page-tab.active{background:#111;color:#fff;border-color:#111}
+.history-list{display:grid;gap:14px}
+.history-month{border:1px solid #e6e6e6;border-radius:16px;padding:14px;background:#fff}
+.history-month h3{margin:0 0 10px;font-size:16px}
+.history-row{
+  display:grid;
+  grid-template-columns:72px minmax(0,1.3fr) minmax(70px,.7fr) minmax(70px,.7fr) minmax(72px,.7fr) 92px;
+  gap:8px;align-items:center;padding:9px 0;border-top:1px solid #f0f0f0;font-size:13px;
+}
+.history-row:first-of-type{border-top:0}
+.submit-project-btn{background:#eee;color:#111;border:0;border-radius:10px;padding:9px 8px;font-weight:700;cursor:pointer}
+.finish-btn{background:#111;color:#fff;border:0;border-radius:10px;padding:9px 10px;font-weight:700;cursor:pointer}
+@media(max-width:520px){
+  .history-row{
+    grid-template-columns:56px minmax(0,1.1fr) minmax(52px,.65fr) minmax(52px,.65fr) minmax(58px,.7fr) 74px;
+    gap:5px;font-size:11px;
+  }
+}
+
+/* One editable table/card per expense item */
+.project-head{display:none!important}
+.project-list{display:grid;gap:12px}
+.project-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.5fr) minmax(92px,.8fr) minmax(92px,.8fr) minmax(105px,.85fr) minmax(130px,1fr) 64px 64px 36px!important;
+  gap:8px!important;
+  align-items:end!important;
+  padding:12px!important;
+  border:1px solid #e5e5e5!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  margin:0!important;
+}
+.project-cell{min-width:0}
+.project-cell label{
+  display:block;
+  margin:0 0 6px;
+  font-size:11px;
+  font-weight:700;
+  color:#777;
+}
+.project-row .remain{
+  min-height:43px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding:0 10px;
+  border:1px solid #e7e7e7;
+  border-radius:12px;
+  background:#fafafa;
+}
+.project-row .submit-project-btn,
+.project-row .finish-btn{
+  min-height:43px;
+  padding:8px 6px!important;
+}
+.project-row .delete-btn{
+  min-height:43px;
+  align-self:end;
+}
+.project-row .due-date{
+  min-height:43px;
+}
+@media(max-width:760px){
+  .project-row{
+    grid-template-columns:minmax(0,1.3fr) minmax(76px,.8fr) minmax(76px,.8fr)!important;
+  }
+  .project-cell.remaining-cell,
+  .project-cell.due-cell{
+    grid-column:auto;
+  }
+  .project-row .submit-project-btn,
+  .project-row .finish-btn,
+  .project-row .delete-btn{
+    width:100%;
+  }
+}
+
+/* Expense item: always one horizontal editable row */
+.project-list{display:grid;gap:10px;overflow-x:auto;padding-bottom:4px}
+.project-row{
+  display:grid!important;
+  grid-template-columns:minmax(150px,1.6fr) 105px 105px 110px 135px 64px 64px 36px!important;
+  gap:7px!important;
+  align-items:end!important;
+  min-width:790px;
+  padding:10px!important;
+  border:1px solid #e5e5e5!important;
+  border-radius:14px!important;
+  background:#fff!important;
+}
+.project-cell{min-width:0!important}
+.project-cell label{display:block;margin:0 0 5px;font-size:11px;font-weight:700;color:#777}
+.project-row input{width:100%!important;box-sizing:border-box!important}
+.project-row .remain,
+.project-row .submit-project-btn,
+.project-row .finish-btn,
+.project-row .delete-btn{height:43px!important;box-sizing:border-box!important}
+@media(max-width:760px){
+  .project-list{overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+  .project-row{
+    grid-template-columns:minmax(150px,1.6fr) 105px 105px 110px 135px 64px 64px 36px!important;
+    min-width:790px!important;
+  }
+}
+
+.project-row{
+  grid-template-columns:minmax(170px,1.7fr) 110px 110px 115px 68px 68px!important;
+  min-width:680px!important;
+}
+@media(max-width:760px){
+  .project-row{
+    grid-template-columns:minmax(170px,1.7fr) 110px 110px 115px 68px 68px!important;
+    min-width:680px!important;
+  }
+}
+
+/* Mobile-first: 6 equal columns, all visible on one screen */
+.project-list{
+  width:100%;
+  overflow:visible!important;
+  padding-bottom:0!important;
+}
+
+.project-row{
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  gap:4px!important;
+  width:100%!important;
+  min-width:0!important;
+  padding:8px!important;
+  align-items:end!important;
+}
+
+.project-cell{
+  min-width:0!important;
+  width:100%!important;
+}
+
+.project-cell label{
+  display:block!important;
+  margin:0 0 4px!important;
+  font-size:10px!important;
+  line-height:1.15!important;
+  font-weight:700!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+}
+
+.project-row input,
+.project-row .remain,
+.project-row .submit-project-btn,
+.project-row .finish-btn{
+  width:100%!important;
+  min-width:0!important;
+  height:36px!important;
+  min-height:36px!important;
+  padding:4px!important;
+  border-radius:8px!important;
+  font-size:10px!important;
+  line-height:1!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+}
+
+.project-row .remain{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+}
+
+.project-row .submit-project-btn,
+.project-row .finish-btn{
+  margin:0!important;
+}
+
+.project-row .due-date,
+.project-row .delete-btn{
+  display:none!important;
+}
+
+@media(max-width:430px){
+  .project-row{
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    gap:3px!important;
+    padding:6px!important;
+  }
+
+  .project-cell label{
+    font-size:9px!important;
+  }
+
+  .project-row input,
+  .project-row .remain,
+  .project-row .submit-project-btn,
+  .project-row .finish-btn{
+    height:34px!important;
+    min-height:34px!important;
+    font-size:9px!important;
+    padding:3px!important;
+  }
+}
+
+.pencil-btn{
+  border:0!important;
+  background:transparent!important;
+  padding:0 1px!important;
+  margin:0!important;
+  width:auto!important;
+  height:auto!important;
+  min-height:0!important;
+  font-size:11px!important;
+  line-height:1!important;
+  cursor:pointer!important;
+  vertical-align:middle!important;
+}
+.project-row input:disabled{
+  opacity:1!important;
+  background:#f6f6f6!important;
+  color:#111!important;
+  -webkit-text-fill-color:#111!important;
+}
+
+.history-edit-row{
+  display:grid;
+  grid-template-columns:105px minmax(120px,1.4fr) 85px 85px 90px 58px 58px;
+  gap:6px;
+  align-items:end;
+  padding:10px 0;
+  border-top:1px solid #eee;
+}
+.history-edit-row input{
+  width:100%;
+  min-width:0;
+  height:36px;
+  padding:4px 6px;
+  font-size:11px;
+  text-align:center;
+  box-sizing:border-box;
+}
+.history-edit-row .history-remain{
+  height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #e5e5e5;
+  border-radius:8px;
+  background:#fafafa;
+  font-size:11px;
+  font-weight:700;
+}
+.history-pencil{
+  border:0;
+  background:#eee;
+  border-radius:8px;
+  height:32px;
+  min-width:32px;
+  cursor:pointer;
+}
+.history-view-row{
+  display:grid;
+  grid-template-columns:54px minmax(0,1.25fr) 72px 72px 76px 34px 34px 34px;
+  gap:6px;
+  align-items:center;
+  padding:9px 0;
+  border-top:1px solid #eee;
+  font-size:11px;
+}
+@media(max-width:430px){
+  .history-view-row{
+    grid-template-columns:42px minmax(0,1.05fr) 56px 56px 60px 30px 30px 30px;
+    gap:3px;
+    font-size:9px;
+  }
+  .history-edit-row{
+    grid-template-columns:82px minmax(82px,1.05fr) 54px 54px 58px 44px 44px;
+    gap:3px;
+  }
+  .history-edit-row input,
+  .history-edit-row .history-remain{
+    font-size:9px;
+    height:32px;
+  }
+}
+
+.history-action{
+  border:0;
+  border-radius:8px;
+  height:30px;
+  min-width:30px;
+  padding:0;
+  cursor:pointer;
+  background:#eee;
+  font-size:14px;
+}
+.history-delete{font-size:16px}
+
+.project-row{
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+  min-width:0!important;
+}
+.project-row .project-created-date{
+  width:100%!important;
+  min-width:0!important;
+  height:34px!important;
+  min-height:34px!important;
+  padding:3px!important;
+  font-size:9px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+}
+@media(max-width:430px){
+  .project-row{
+    grid-template-columns:repeat(7,minmax(0,1fr))!important;
+    min-width:0!important;
+  }
+}
+
+.project-row{
+  grid-template-columns:repeat(7,minmax(0,1fr))!important;
+}
+.project-row .due-date{
+  display:block!important;
+  width:100%!important;
+  min-width:0!important;
+  height:34px!important;
+  min-height:34px!important;
+  padding:2px!important;
+  font-size:8px!important;
+  text-align:center!important;
+  box-sizing:border-box!important;
+}
+.project-row .submit-project-btn{display:none!important}
+
+.project-row .date-display{
+  width:100%!important;
+  min-width:0!important;
+  height:34px!important;
+  min-height:34px!important;
+  padding:3px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:1px solid #e7e7e7!important;
+  border-radius:8px!important;
+  background:#fafafa!important;
+  font-size:9px!important;
+  line-height:1!important;
+  font-weight:600!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  box-sizing:border-box!important;
+}
+
+.history-view-row{
+  display:grid!important;
+  grid-template-columns:1fr 1fr 1fr!important;
+  gap:7px!important;
+  padding:12px 0!important;
+  font-size:11px!important;
+  align-items:center!important;
+}
+.history-view-row > div:nth-child(1),
+.history-view-row > div:nth-child(2){
+  grid-column:auto!important;
+}
+.history-view-row > div:nth-child(2){
+  grid-column:2 / 4!important;
+  font-weight:700!important;
+  text-align:left!important;
+  overflow-wrap:anywhere!important;
+}
+.history-view-row > div:nth-child(3),
+.history-view-row > div:nth-child(4),
+.history-view-row > div:nth-child(5){
+  text-align:center!important;
+  background:#fafafa!important;
+  border-radius:8px!important;
+  padding:8px 3px!important;
+  min-width:0!important;
+}
+.history-view-row .history-pencil,
+.history-view-row .history-return,
+.history-view-row .history-delete{
+  width:100%!important;
+  height:34px!important;
+}
+@media(max-width:430px){
+  .history-view-row{
+    grid-template-columns:1fr 1fr 1fr!important;
+    gap:5px!important;
+    font-size:10px!important;
+  }
+}
+
+.project-row input.project-created-date{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  font-size:8px!important;
+  padding:2px!important;
+  overflow:hidden!important;
+}
+
+/* Mobile project list: keep useful column widths and allow horizontal swipe */
+#projectList{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:visible;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  padding-bottom:8px;
+}
+#projectList .project-row{
+  grid-template-columns:120px 130px 170px 120px 120px 120px 90px!important;
+  min-width:860px!important;
+  width:max-content!important;
+}
+#projectList .project-cell,
+#projectList .project-cell input,
+#projectList .remain,
+#projectList .finish-btn{
+  font-size:12px!important;
+}
+#projectList input.project-created-date,
+#projectList .due-date{
+  font-size:11px!important;
+}
+@media(max-width:430px){
+  #projectList{
+    overflow-x:auto!important;
+  }
+  #projectList .project-row{
+    grid-template-columns:115px 125px 155px 110px 110px 110px 85px!important;
+    min-width:800px!important;
+  }
+}
+
+/* History records may also swipe horizontally if editing creates a wide row */
+#historyGroups{
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.history-edit-row{
+  min-width:720px;
+}
+
+.project-summary{
+  margin-top:18px;
+  padding:16px;
+  border:1px solid #e7e7e7;
+  border-radius:18px;
+  background:#fff;
+}
+.summary-title{
+  font-size:18px;
+  font-weight:800;
+  margin-bottom:12px;
+}
+.summary-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.summary-box{
+  min-width:0;
+  padding:12px 8px;
+  border-radius:12px;
+  background:#f5f5f5;
+  text-align:center;
+}
+.summary-box span{
+  display:block;
+  font-size:11px;
+  margin-bottom:6px;
+}
+.summary-box strong{
+  display:block;
+  font-size:13px;
+  overflow-wrap:anywhere;
+}
+.summary-box strong.negative{
+  color:#c62828;
+}
+
+:root{
+  --ink:#171717;
+  --muted:#777;
+  --line:#e8e5df;
+  --soft:#f7f5f1;
+  --card:#ffffff;
+  --danger:#b42318;
+}
+body{
+  background:linear-gradient(180deg,#f7f5f1 0,#fbfaf8 42%,#f4f2ee 100%)!important;
+  color:var(--ink)!important;
+}
+.container{
+  width:min(1180px,calc(100% - 28px))!important;
+  max-width:none!important;
+  margin:0 auto!important;
+}
+.panel{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+  border:1px solid rgba(23,23,23,.07)!important;
+  border-radius:24px!important;
+  background:rgba(255,255,255,.94)!important;
+  box-shadow:0 18px 50px rgba(20,20,20,.07)!important;
+  padding:22px!important;
+}
+.panel-head{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:14px!important;
+}
+.panel-head h2{
+  font-size:25px!important;
+  letter-spacing:-.03em!important;
+}
+.btn{
+  border-radius:12px!important;
+  min-height:42px!important;
+  font-weight:700!important;
+}
+.btn.primary{
+  background:#1c1c1c!important;
+  color:#fff!important;
+}
+.btn.secondary{
+  background:#f3f1ed!important;
+  color:#242424!important;
+  border:1px solid #e5e1da!important;
+}
+#projectList{
+  margin-top:16px!important;
+  border:1px solid var(--line)!important;
+  border-radius:18px!important;
+  background:#fbfaf8!important;
+  padding:8px!important;
+  box-sizing:border-box!important;
+}
+#projectList .project-row{
+  border:0!important;
+  border-bottom:1px solid var(--line)!important;
+  border-radius:12px!important;
+  box-shadow:none!important;
+  background:#fff!important;
+  padding:12px!important;
+}
+#projectList .project-row:last-child{
+  border-bottom:0!important;
+}
+.project-cell label{
+  color:#777!important;
+  letter-spacing:.01em!important;
+}
+.project-row input,
+.project-row .remain,
+.project-row .date-display{
+  border:1px solid #e7e3dd!important;
+  background:#faf9f7!important;
+  border-radius:10px!important;
+}
+.project-row input:focus{
+  outline:none!important;
+  border-color:#a8a198!important;
+  box-shadow:0 0 0 3px rgba(110,101,90,.08)!important;
+}
+.finish-btn{
+  background:#1d1d1d!important;
+  color:#fff!important;
+  border:0!important;
+  border-radius:10px!important;
+}
+.add-btn{
+  margin-top:14px!important;
+  min-height:48px!important;
+  border-radius:14px!important;
+}
+.project-summary{
+  width:100%!important;
+  box-sizing:border-box!important;
+  margin-top:18px!important;
+  padding:20px!important;
+  border:0!important;
+  border-radius:20px!important;
+  background:#191919!important;
+  color:#fff!important;
+  box-shadow:0 14px 30px rgba(0,0,0,.12)!important;
+}
+.summary-title{
+  font-size:13px!important;
+  font-weight:700!important;
+  opacity:.6!important;
+  text-transform:uppercase!important;
+  letter-spacing:.12em!important;
+  margin-bottom:14px!important;
+}
+.summary-grid{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.summary-box{
+  background:rgba(255,255,255,.07)!important;
+  border:1px solid rgba(255,255,255,.08)!important;
+  border-radius:14px!important;
+  padding:15px 12px!important;
+}
+.summary-box span{
+  color:rgba(255,255,255,.62)!important;
+  font-size:11px!important;
+}
+.summary-box strong{
+  color:#fff!important;
+  font-size:17px!important;
+  letter-spacing:-.02em!important;
+}
+.summary-box strong.negative{
+  color:#ff8a80!important;
+}
+.history-month{
+  border:1px solid var(--line)!important;
+  border-radius:18px!important;
+  box-shadow:none!important;
+  background:#fff!important;
+}
+@media(max-width:600px){
+  .container{
+    width:calc(100% - 16px)!important;
+  }
+  .panel{
+    padding:14px!important;
+    border-radius:18px!important;
+  }
+  .panel-head h2{
+    font-size:21px!important;
+  }
+  .summary-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+  }
+  .summary-box{
+    padding:12px 5px!important;
+  }
+  .summary-box strong{
+    font-size:12px!important;
+  }
+  #projectList{
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+}
+
+/* Complete debt-management dashboard */
+.debt-toolbar{
+  display:flex; gap:10px; align-items:center; margin:18px 0 8px;
+}
+.toolbar-search{
+  flex:1; display:flex; align-items:center; gap:8px; min-height:44px;
+  padding:0 13px; background:#fff; border:1px solid var(--line);
+  border-radius:13px;
+}
+.toolbar-search input{
+  width:100%; border:0!important; outline:0!important; background:transparent!important;
+  box-shadow:none!important; font-size:13px;
+}
+#debtFilter{
+  min-height:44px; padding:0 12px; border:1px solid var(--line);
+  border-radius:13px; background:#fff; font-weight:650;
+}
+.table-hint{font-size:11px;color:#999;margin:0 2px 7px;}
+.summary-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.summary-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:3px;}
+.progress-pill{
+  white-space:nowrap;padding:7px 10px;border-radius:999px;
+  background:rgba(255,255,255,.1);font-size:11px;font-weight:750;
+}
+.progress-track{
+  height:7px;border-radius:99px;background:rgba(255,255,255,.1);
+  overflow:hidden;margin-top:15px;
+}
+.progress-bar{
+  width:0;height:100%;border-radius:inherit;background:#fff;
+  transition:width .25s ease;
+}
+.mini-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:14px;
+}
+.mini-stats div{
+  background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;padding:10px 8px;text-align:center;
+}
+.mini-stats span{display:block;font-size:9px;color:rgba(255,255,255,.48);margin-bottom:4px;}
+.mini-stats b{font-size:14px;color:#fff;}
+.project-row.is-overdue{box-shadow:inset 3px 0 0 #b42318!important;}
+.project-row.is-due-soon{box-shadow:inset 3px 0 0 #b7791f!important;}
+@media(max-width:600px){
+ .debt-toolbar{gap:6px}
+ #debtFilter{max-width:118px;font-size:11px}
+ .mini-stats{grid-template-columns:repeat(4,1fr);gap:4px}
+ .mini-stats div{padding:8px 3px}
+}
+
+#projectSummary.debt-summary-visible{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;box-sizing:border-box!important;margin:0 0 18px!important;}
+.page-subtitle{font-size:12px;color:#888;margin-top:3px}
+.investment-page{width:100%!important}
+.capital-editor{
+ display:flex;justify-content:space-between;align-items:center;gap:16px;
+ margin:18px 0;padding:18px;border:1px solid var(--line);border-radius:18px;background:#faf9f7;
+}
+.capital-editor span{display:block;font-size:11px;color:#777;margin-bottom:5px}
+.capital-editor strong{font-size:24px;letter-spacing:-.03em}
+.capital-input-wrap{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.capital-input-wrap span{width:100%}
+.capital-input-wrap input{
+ width:180px;min-height:42px;border:1px solid var(--line);border-radius:11px;padding:0 11px;background:#fff
+}
+.investment-summary{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px
+}
+.invest-summary-card{
+ padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff
+}
+.invest-summary-card span{display:block;font-size:10px;color:#777;margin-bottom:7px}
+.invest-summary-card strong{font-size:17px}
+.invest-summary-card .profit-positive{color:#16794b}
+.invest-summary-card .profit-negative{color:#b42318}
+.invest-table-wrap{
+ width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);
+ border-radius:17px;background:#fff
+}
+.invest-grid{
+ display:grid;grid-template-columns:115px 180px 125px 125px 125px 125px 100px 105px 130px;
+ min-width:1130px;align-items:center
+}
+.invest-table-head{
+ padding:11px 10px;background:#f6f4f0;font-size:10px;color:#777;font-weight:750
+}
+.invest-row{padding:9px 10px;border-top:1px solid var(--line)}
+.invest-row input,.invest-row select{
+ width:calc(100% - 8px);box-sizing:border-box;min-height:38px;padding:6px 8px;
+ border:1px solid #e7e3dd;border-radius:9px;background:#faf9f7;font-size:11px
+}
+.invest-calc{font-size:11px;font-weight:750;padding:0 5px}
+.invest-actions{display:flex;gap:5px}
+.invest-actions button{border:0;border-radius:8px;padding:8px 9px;font-size:10px;font-weight:750;cursor:pointer}
+.invest-save{background:#1d1d1d;color:#fff}.invest-delete{background:#f2efeb;color:#555}
+.invest-add{margin-top:13px;width:100%;min-height:48px}
+@media(max-width:600px){
+ .capital-editor{align-items:flex-start;flex-direction:column}
+ .capital-input-wrap{width:100%}.capital-input-wrap input{flex:1;width:auto;min-width:0}
+ .investment-summary{grid-template-columns:repeat(2,1fr)}
+ .invest-summary-card{padding:13px 10px}.invest-summary-card strong{font-size:14px}
+}
+
+/* Mobile table sizing: show a useful part of the table immediately */
+.invest-table-wrap,
+#projectList{
+  width:100%!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+.invest-grid{
+  grid-template-columns:100px 145px 100px 105px 105px 110px 85px 90px 110px!important;
+  min-width:950px!important;
+}
+#projectList .project-row{
+  grid-template-columns:105px 115px 145px 105px 105px 105px 80px!important;
+  min-width:760px!important;
+}
+@media(max-width:600px){
+  .invest-table-wrap{
+    border-radius:14px!important;
+  }
+  .invest-grid{
+    grid-template-columns:92px 130px 92px 96px 96px 102px 76px 82px 100px!important;
+    min-width:866px!important;
+  }
+  #projectList .project-row{
+    grid-template-columns:96px 108px 132px 96px 96px 96px 76px!important;
+    min-width:700px!important;
+  }
+  .invest-table-head,
+  .invest-row{
+    font-size:10px!important;
+  }
+  .invest-row input,
+  .invest-row select{
+    min-height:34px!important;
+    font-size:10px!important;
+    padding:4px 5px!important;
+  }
+  .invest-calc{
+    font-size:10px!important;
+  }
+  .table-hint{
+    display:block!important;
+    margin:5px 2px 8px!important;
+  }
+}
+
+.receivable-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:18px 0}
+.receivable-summary>div{padding:15px;border:1px solid var(--line);border-radius:15px;background:#fff}
+.receivable-summary span{display:block;font-size:10px;color:#777;margin-bottom:6px}
+.receivable-summary strong{font-size:16px}
+.rec-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:17px;background:#fff}
+.rec-grid{display:grid;grid-template-columns:105px 115px 140px 155px 115px 115px 115px 95px 130px;min-width:1090px;align-items:center}
+.rec-head{padding:11px 10px;background:#f6f4f0;font-size:10px;color:#777;font-weight:750}
+.rec-row{padding:9px 10px;border-top:1px solid var(--line)}
+.rec-row input,.rec-row select{width:calc(100% - 8px);box-sizing:border-box;min-height:36px;padding:5px 7px;border:1px solid #e7e3dd;border-radius:9px;background:#faf9f7;font-size:10px}
+.rec-calc{font-size:10px;font-weight:750;padding:0 5px}
+.rec-overdue{box-shadow:inset 3px 0 0 #b42318}
+.rec-actions{display:flex;gap:5px}
+.rec-actions button{border:0;border-radius:8px;padding:8px 9px;font-size:10px;font-weight:750;cursor:pointer}
+.rec-save{background:#1d1d1d;color:#fff}.rec-delete{background:#f2efeb;color:#555}
+@media(max-width:600px){
+ .receivable-summary{grid-template-columns:repeat(2,1fr)}
+ .receivable-summary>div:last-child{grid-column:span 2}
+ .rec-grid{grid-template-columns:96px 105px 125px 135px 105px 105px 105px 85px 115px;min-width:976px}
+}
+
+.wealth-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:18px 0}
+.wealth-kpis>div{padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.wealth-kpis span{display:block;font-size:10px;color:#777;margin-bottom:7px}
+.wealth-kpis strong{font-size:18px}
+.wealth-kpis .wealth-main{background:#191919;color:#fff;border-color:#191919}
+.wealth-kpis .wealth-main span{color:rgba(255,255,255,.55)}
+.allocation-settings{padding:17px;border:1px solid var(--line);border-radius:18px;background:#faf9f7;margin-bottom:14px}
+.allocation-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.allocation-title small{display:block;color:#888;font-size:10px;margin-top:3px}
+.allocation-title>strong{font-size:20px}
+.allocation-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
+.allocation-grid label{font-size:10px;color:#777;position:relative}
+.allocation-grid input{width:100%;box-sizing:border-box;min-height:40px;margin-top:5px;padding:6px 24px 6px 8px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.allocation-grid label span{position:absolute;right:8px;bottom:11px}
+.wealth-entry{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin:14px 0}
+.wealth-entry label{display:block;font-size:10px;color:#777;margin-bottom:5px}
+.wealth-entry input{width:100%;box-sizing:border-box;min-height:42px;border:1px solid var(--line);border-radius:11px;padding:0 9px;background:#fff}
+.wealth-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:17px;background:#fff}
+.wealth-grid{display:grid;grid-template-columns:105px repeat(8,110px) 120px;min-width:1105px;align-items:center}
+.wealth-head{padding:11px 10px;background:#f6f4f0;font-size:10px;color:#777;font-weight:750}
+.wealth-row{padding:10px;border-top:1px solid var(--line);font-size:10px}
+.wealth-row .net{font-weight:800}.wealth-row .negative{color:#b42318}
+.wealth-delete{border:0;border-radius:8px;padding:8px 10px;font-size:10px;font-weight:750;background:#f2efeb;color:#555}
+@media(max-width:600px){
+ .wealth-kpis{grid-template-columns:repeat(2,1fr)}
+ .allocation-grid{grid-template-columns:repeat(2,1fr)}
+ .allocation-grid label:last-child{grid-column:span 2}
+ .wealth-entry{grid-template-columns:1fr 1fr}
+ .wealth-entry>div:first-child,.wealth-entry button{grid-column:span 2}
+}
+
+.agent-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:18px 0}
+.agent-summary>div{padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.agent-summary span{display:block;font-size:10px;color:#777;margin-bottom:7px}
+.agent-summary strong{font-size:17px}
+.agent-summary .agent-profit{background:#191919;color:#fff;border-color:#191919}
+.agent-summary .agent-profit span{color:rgba(255,255,255,.55)}
+.agent-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:17px;background:#fff}
+.agent-grid{display:grid;grid-template-columns:100px 135px 165px repeat(7,115px) 130px 95px 130px;min-width:1500px;align-items:center}
+.agent-head{padding:11px 10px;background:#f6f4f0;font-size:10px;color:#777;font-weight:750}
+.agent-row{padding:9px 10px;border-top:1px solid var(--line)}
+.agent-row input,.agent-row select{width:calc(100% - 8px);box-sizing:border-box;min-height:36px;padding:5px 7px;border:1px solid #e7e3dd;border-radius:9px;background:#faf9f7;font-size:10px}
+.agent-calc{font-size:10px;font-weight:750;padding:0 5px}.agent-negative{color:#b42318}
+.agent-actions{display:flex;gap:5px}.agent-actions button{border:0;border-radius:8px;padding:8px 9px;font-size:10px;font-weight:750;cursor:pointer}
+.agent-save{background:#1d1d1d;color:#fff}.agent-delete{background:#f2efeb;color:#555}
+@media(max-width:600px){
+ .agent-summary{grid-template-columns:repeat(2,1fr)}
+ .agent-grid{grid-template-columns:92px 120px 145px repeat(7,102px) 115px 85px 115px;min-width:1334px}
+}
+
+.fx-card{max-width:680px;margin:20px auto;padding:22px;border:1px solid var(--line);border-radius:22px;background:#fff}
+.fx-field label,.fx-pair label,.fx-rate label{display:block;font-size:10px;color:#777;margin-bottom:6px}
+.fx-field input,.fx-pair select,.fx-rate input{width:100%;box-sizing:border-box;min-height:48px;border:1px solid var(--line);border-radius:12px;background:#faf9f7;padding:0 12px;font-size:14px}
+.fx-pair{display:grid;grid-template-columns:1fr 48px 1fr;gap:9px;align-items:end;margin-top:14px}
+#fxSwap{height:48px;border:1px solid var(--line);border-radius:12px;background:#191919;color:#fff;font-size:18px}
+.fx-rate{margin-top:14px}.fx-rate>div{display:flex;align-items:center;gap:10px}.fx-rate>div span{font-weight:800}
+.fx-result{margin-top:18px;padding:22px;border-radius:18px;background:#191919;color:#fff}
+.fx-result span,.fx-result small{display:block;color:rgba(255,255,255,.55);font-size:10px}.fx-result strong{display:block;font-size:28px;margin:7px 0}
+.fx-shortcuts{max-width:680px;margin:0 auto;padding:16px;border:1px solid var(--line);border-radius:18px;background:#faf9f7}
+.fx-shortcuts>b{font-size:12px}.fx-shortcuts>div{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.fx-quick{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;font-size:10px;font-weight:750}
+.fx-note{max-width:680px;margin:10px auto 0;color:#888;font-size:10px;line-height:1.6}
+
+.menu-toggle{position:fixed;left:14px;top:14px;z-index:1100;width:42px;height:42px;border:1px solid rgba(0,0,0,.08);border-radius:12px;background:#191919;color:#fff;font-size:21px;line-height:1;box-shadow:0 5px 18px rgba(0,0,0,.12);cursor:pointer}
+.app-sidebar{position:fixed;left:0;top:0;bottom:0;width:270px;z-index:1300;background:#171717;color:#fff;padding:20px 14px;box-sizing:border-box;transform:translateX(-102%);transition:transform .22s ease;box-shadow:12px 0 30px rgba(0,0,0,.18)}
+.app-sidebar.open{transform:translateX(0)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:1200}
+.sidebar-overlay.open{display:block}
+.sidebar-top{display:flex;align-items:center;justify-content:space-between;padding:4px 5px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sidebar-top strong{display:block;font-size:18px;letter-spacing:.6px}.sidebar-top small{display:block;color:#888;font-size:9px;margin-top:2px}
+#menuClose{width:34px;height:34px;border:0;border-radius:10px;background:#292929;color:#fff;font-size:22px;cursor:pointer}
+.sidebar-nav{display:flex;flex-direction:column;gap:5px;padding-top:14px}
+.sidebar-nav button{width:100%;border:0;border-radius:11px;background:transparent;color:#ddd;text-align:left;padding:13px 14px;font-size:13px;font-weight:650;cursor:pointer}
+.sidebar-nav button:hover,.sidebar-nav button.active{background:#fff;color:#171717}
+@media(max-width:600px){.menu-toggle{left:10px;top:10px}.app-sidebar{width:min(82vw,290px)}}
+
+.business-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:18px 0}
+.business-summary>div{padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.business-summary span{display:block;font-size:10px;color:#777;margin-bottom:7px}.business-summary strong{font-size:17px}
+.business-summary .biz-profit{background:#191919;color:#fff;border-color:#191919}.business-summary .biz-profit span{color:rgba(255,255,255,.55)}
+.business-entry{display:grid;grid-template-columns:110px 1.4fr repeat(3,1fr) auto;gap:8px;align-items:end;margin:14px 0;padding:15px;border:1px solid var(--line);border-radius:17px;background:#faf9f7}
+.business-entry label{display:block;font-size:10px;color:#777;margin-bottom:5px}.business-entry input{width:100%;box-sizing:border-box;min-height:42px;border:1px solid var(--line);border-radius:11px;padding:0 9px;background:#fff}
+.business-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:17px;background:#fff}
+.business-grid{display:grid;grid-template-columns:105px 170px repeat(5,115px) 125px;min-width:975px;align-items:center}
+.business-head{padding:11px 10px;background:#f6f4f0;font-size:10px;color:#777;font-weight:750}.business-row{padding:10px;border-top:1px solid var(--line);font-size:10px}
+.biz-net{font-weight:800}.biz-negative{color:#b42318}.biz-delete{border:0;border-radius:8px;padding:8px 10px;font-size:10px;font-weight:750;background:#f2efeb;color:#555}
+@media(max-width:700px){.business-summary{grid-template-columns:repeat(2,1fr)}.business-entry{grid-template-columns:1fr 1fr}.business-entry>div:nth-child(2),.business-entry button{grid-column:span 2}}
+
+.fx-month-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:18px 0}
+.fx-month-summary>div{padding:15px;border:1px solid var(--line);border-radius:15px;background:#fff}
+.fx-month-summary span{display:block;font-size:10px;color:#777;margin-bottom:6px}.fx-month-summary strong{font-size:16px}
+.fx-entry-grid{display:grid;grid-template-columns:110px 1fr 1fr;gap:9px}.fx-entry-grid label{display:block;font-size:10px;color:#777;margin-bottom:6px}
+.fx-entry-grid input{width:100%;box-sizing:border-box;min-height:48px;border:1px solid var(--line);border-radius:12px;background:#faf9f7;padding:0 12px;font-size:14px}
+.fx-history-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:17px;background:#fff}
+.fx-history-grid{display:grid;grid-template-columns:105px 145px 140px 85px 110px 150px 100px;min-width:835px;align-items:center}
+.fx-history-head{padding:11px 10px;background:#f6f4f0;font-size:10px;color:#777;font-weight:750}
+.fx-history-row{padding:10px;border-top:1px solid var(--line);font-size:10px}.fx-history-row b{font-size:11px}
+.fx-history-row button{border:0;border-radius:8px;padding:8px 10px;font-size:10px;font-weight:750;background:#f2efeb;color:#555}
+@media(max-width:600px){.fx-month-summary{grid-template-columns:repeat(2,1fr)}.fx-entry-grid{grid-template-columns:1fr 1fr}.fx-entry-grid>div:nth-child(2){grid-column:span 1}}
+
+/* 项目页不再显示中间一排目录按钮，统一使用左上角 ☰ 侧栏 */
+#projectPage #investmentBtn,
+#projectPage #receivableBtn,
+#projectPage #wealthBtn,
+#projectPage #agentBtn,
+#projectPage #fxBtn,
+#projectPage #historyBtn{
+  display:none!important;
+}
+
+/* 顶部品牌完整显示 */
+.topbar{
+  position:sticky!important;
+  padding-left:76px!important;
+  padding-right:16px!important;
+}
+.topbar>div:first-child{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  width:auto;
+  pointer-events:none;
+}
+.topbar .logo.small{
+  font-size:15px!important;
+  letter-spacing:.28em!important;
+  margin:0!important;
+  white-space:nowrap!important;
+}
+.topbar .user-area{margin-left:auto!important}
+@media(max-width:600px){
+  .topbar{height:76px!important;padding-left:76px!important;padding-right:12px!important}
+  .topbar .logo.small{font-size:13px!important;letter-spacing:.22em!important}
+  .small-btn{padding:10px 12px!important}
+}
+
+/* 全部功能页面改为真正全屏宽度 */
+main,
+.app,
+.app-shell,
+.container,
+.content,
+.page-container,
+main.container{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  box-sizing:border-box!important;
+}
+#projectPage,
+#historyPage,
+#investmentPage,
+#receivablePage,
+#wealthPage,
+#agentPage,
+#fxPage,
+#businessPage{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  border-radius:0!important;
+}
+.panel{
+  max-width:none!important;
+}
+body{
+  width:100%!important;
+  max-width:none!important;
+  overflow-x:hidden!important;
+}
+@media(max-width:600px){
+  main,.app,.app-shell,.container,.content,.page-container,main.container{
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+  #projectPage,#historyPage,#investmentPage,#receivablePage,
+  #wealthPage,#agentPage,#fxPage,#businessPage{
+    padding-left:14px!important;
+    padding-right:14px!important;
+  }
+}
+
+.menu-toggle{pointer-events:auto!important;z-index:5000!important}
+.app-sidebar{z-index:5200!important}
+.sidebar-overlay{z-index:5100!important}
+.sidebar-nav button{pointer-events:auto!important;touch-action:manipulation!important}
+
+/* 未登入时隐藏菜单；登入成功后 JS 才显示 */
+#menuToggle{display:none!important}
+body.authenticated #menuToggle{display:block!important}
+body:not(.authenticated) #appSidebar,
+body:not(.authenticated) #sidebarOverlay{display:none!important}
+</style>
+</head>
+<body>
+
+<button id="menuToggle" class="menu-toggle" type="button" aria-label="打开菜单">☰</button>
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+<aside id="appSidebar" class="app-sidebar">
+  <div class="sidebar-top">
+    <div><strong>LEINGBOX</strong><small>Finance</small></div>
+    <button id="menuClose" type="button">×</button>
+  </div>
+  <nav class="sidebar-nav">
+    <button data-page="projectPage">项目</button>
+    <button data-page="businessPage">生意表</button>
+    <button data-page="investmentPage">投资表</button>
+    <button data-page="projectPage">债务表</button>
+    <button data-page="receivablePage">别人欠我</button>
+    <button data-page="wealthPage">财富分配</button>
+    <button data-page="agentPage">中介业务</button>
+    <button data-page="fxPage">汇率换算</button>
+    <button data-page="historyPage">历史记录</button>
+  </nav>
+</aside>
+
+  <section id="loginPage" class="login-page">
+    <div class="login-card">
+      <div class="logo">LEINGBOX</div>
+      <h1>Login</h1>
+      <p class="sub"></p>
+
+      <label for="username">Email</label>
+      <input id="username" autocomplete="username" placeholder="Email">
+
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
+
+      <button id="loginBtn" class="btn primary">LOGIN</button>
+      <button id="forgotPasswordBtn" type="button" style="display:block;width:100%;margin-top:10px;background:none;border:0;color:#666;text-decoration:underline;cursor:pointer;">忘记密码？</button>
+      <div id="loginError" class="error"></div>
+    </div>
+  </section>
+
+  <section id="financePage" class="app hidden">
+    <header class="topbar">
+      <div>
+        <div class="logo small">LEINGBOX</div>
+        
+      </div>
+      <div class="user-area">
+        <span id="signedUser" class="pill" style="display:none"></span>
+        <button id="logoutBtn" class="btn secondary small-btn">Logout</button>
+      </div>
+    </header>
+
+    <main class="container">
+
+      <section class="panel">
+        <div class="panel-head" style="margin-bottom:14px;">
+          <div>
+            <h2 style="margin:0;">项目</h2>
+          </div>
+
+        </div>
+
+        <div id="projectPage">
+<section id="projectSummary" class="project-summary debt-summary-visible">
+  <div class="summary-head">
+    <div><div class="summary-title">债务总结</div><div class="summary-sub">当前未完成债务自动计算</div></div>
+    <div id="summaryProgressText" class="progress-pill">0% 已还</div>
+  </div>
+  <div class="summary-grid">
+    <div class="summary-box"><span>总债务</span><strong id="summaryPrice">RM 0.00</strong></div>
+    <div class="summary-box"><span>已还款</span><strong id="summaryDeduct">RM 0.00</strong></div>
+    <div class="summary-box"><span>剩余债务</span><strong id="summaryRemaining">RM 0.00</strong></div>
+  </div>
+  <div class="progress-track"><div id="summaryProgressBar" class="progress-bar"></div></div>
+  <div class="mini-stats">
+    <div><span>进行中</span><b id="summaryActive">0</b></div>
+    <div><span>已完成</span><b id="summaryDone">0</b></div>
+    <div><span>即将到期</span><b id="summaryDueSoon">0</b></div>
+    <div><span>已逾期</span><b id="summaryOverdue">0</b></div>
+  </div>
+</section>
+<div class="debt-toolbar">
+  <div class="toolbar-search"><span>⌕</span><input id="debtSearch" type="search" placeholder="搜索项目"></div>
+  <select id="debtFilter"><option value="all">全部债务</option><option value="overdue">已逾期</option><option value="soon">即将到期</option></select>
+</div>
+<div class="table-hint">左右滑动查看完整资料 →</div>
+
+          <div id="projectList" class="project-list"></div>
+          <div id="emptyText" class="empty">还没有项目</div>
+          <button id="addProjectBtn" class="btn primary add-btn" type="button" style="width:100%;margin-top:14px;">＋ 新添项目</button>
+        </div>
+
+<section id="businessPage" class="panel business-page" style="display:none">
+  <div class="panel-head">
+    <div><h2>生意表</h2><div class="page-subtitle">营业额 · 成本 · 开销 · 纯利润</div></div>
+    <button id="businessBackBtn" class="btn secondary" type="button">项目</button>
+  </div>
+
+  <div class="business-summary">
+    <div><span>本月营业额</span><strong id="bizRevenue">RM 0.00</strong></div>
+    <div><span>本月成本</span><strong id="bizCost">RM 0.00</strong></div>
+    <div><span>本月开销</span><strong id="bizExpense">RM 0.00</strong></div>
+    <div class="biz-profit"><span>本月纯利润</span><strong id="bizProfit">RM 0.00</strong></div>
+    <div><span>利润率</span><strong id="bizMargin">0%</strong></div>
+    <div><span>今年纯利润</span><strong id="bizYearProfit">RM 0.00</strong></div>
+  </div>
+
+  <div class="business-entry">
+    <div><label>日期</label><input id="bizDate" type="date"></div>
+    <div><label>生意 / 公司</label><input id="bizName" placeholder="例如 Nature's Dao"></div>
+    <div><label>营业额</label><input id="bizRevenueInput" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    <div><label>货物 / 服务成本</label><input id="bizCostInput" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    <div><label>其他开销</label><input id="bizExpenseInput" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    <button id="addBusinessBtn" class="btn primary" type="button">加入记录</button>
+  </div>
+
+  <div class="debt-toolbar">
+    <div class="toolbar-search"><span>⌕</span><input id="bizSearch" type="search" placeholder="搜索生意 / 公司"></div>
+    <select id="bizMonth"></select>
+  </div>
+  <div class="table-hint">左右滑动查看完整资料 →</div>
+  <div class="business-table-wrap">
+    <div class="business-grid business-head">
+      <div>日期</div><div>生意 / 公司</div><div>营业额</div><div>成本</div><div>其他开销</div>
+      <div>纯利润</div><div>利润率</div><div>操作</div>
+    </div>
+    <div id="businessList"></div>
+  </div>
+</section>
+
+<section id="fxPage" class="panel fx-page" style="display:none">
+  <div class="panel-head">
+    <div><h2>汇率交易</h2><div class="page-subtitle">顾客换汇 · 每笔交易 · 月度历史</div></div>
+    <button id="fxBackBtn" class="btn secondary" type="button">项目</button>
+  </div>
+
+  <div class="fx-month-summary">
+    <div><span>本月交易笔数</span><strong id="fxMonthCount">0</strong></div>
+    <div><span>本月换出总额</span><strong id="fxMonthFrom">—</strong></div>
+    <div><span>本月换入总额</span><strong id="fxMonthTo">—</strong></div>
+    <div><span>本月顾客人数</span><strong id="fxMonthCustomers">0</strong></div>
+  </div>
+
+  <div class="fx-card">
+    <div class="fx-entry-grid">
+      <div><label>日期</label><input id="fxDate" type="date"></div>
+      <div><label>顾客名字</label><input id="fxCustomer" placeholder="顾客名字"></div>
+      <div><label>金额</label><input id="fxAmount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="fx-pair">
+      <div><label>顾客给</label><select id="fxFrom"><option>MYR</option><option>SGD</option><option>USD</option><option>CNY</option><option>THB</option><option>JPY</option><option>EUR</option><option>GBP</option><option>HKD</option><option>IDR</option></select></div>
+      <button id="fxSwap" type="button">⇄</button>
+      <div><label>顾客收到</label><select id="fxTo"><option>SGD</option><option>MYR</option><option>USD</option><option>CNY</option><option>THB</option><option>JPY</option><option>EUR</option><option>GBP</option><option>HKD</option><option>IDR</option></select></div>
+    </div>
+    <div class="fx-rate"><label>交易汇率 <small>1 <span id="fxFromLabel">MYR</span> =</small></label><div><input id="fxRate" type="number" min="0" step="0.000001" placeholder="实际成交汇率"><span id="fxToLabel">SGD</span></div></div>
+    <div class="fx-result"><span>顾客应收到</span><strong id="fxResult">SGD 0.00</strong><small id="fxFormula">输入金额和汇率后自动计算</small></div>
+    <button id="saveFxTransaction" class="btn primary" type="button" style="width:100%;margin-top:12px">保存这笔交易</button>
+  </div>
+
+  <div class="debt-toolbar">
+    <div class="toolbar-search"><span>⌕</span><input id="fxSearch" type="search" placeholder="搜索顾客"></div>
+    <select id="fxHistoryMonth"></select>
+  </div>
+  <div class="table-hint">每个月的顾客换汇交易都会保留 · 左右滑动查看 →</div>
+  <div class="fx-history-wrap">
+    <div class="fx-history-grid fx-history-head"><div>日期</div><div>顾客</div><div>顾客给</div><div>换成</div><div>汇率</div><div>顾客收到</div><div>操作</div></div>
+    <div id="fxHistoryList"></div>
+  </div>
+</section>
+
+<section id="agentPage" class="panel agent-page" style="display:none">
+  <div class="panel-head">
+    <div><h2>中介业务</h2><div class="page-subtitle">成交 · 成本 · 佣金 · 收款管理</div></div>
+    <button id="agentBackBtn" class="btn secondary" type="button">我的债务</button>
+  </div>
+
+  <div class="agent-summary">
+    <div><span>本月成交额</span><strong id="aMonthSales">RM 0.00</strong></div>
+    <div><span>本月佣金</span><strong id="aMonthCommission">RM 0.00</strong></div>
+    <div class="agent-profit"><span>本月实际利润</span><strong id="aMonthProfit">RM 0.00</strong></div>
+    <div><span>已收</span><strong id="aReceived">RM 0.00</strong></div>
+    <div><span>未收</span><strong id="aOutstanding">RM 0.00</strong></div>
+    <div><span>进行中 / 完成</span><strong id="aStatusCount">0 / 0</strong></div>
+  </div>
+
+  <div class="debt-toolbar">
+    <div class="toolbar-search"><span>⌕</span><input id="agentSearch" type="search" placeholder="搜索客户 / 项目 / 来源人"></div>
+    <select id="agentFilter"><option value="all">全部</option><option value="open">进行中</option><option value="done">已完成</option><option value="unpaid">未收完</option></select>
+  </div>
+  <div class="table-hint">左右滑动查看完整资料 →</div>
+
+  <div class="agent-table-wrap">
+    <div class="agent-grid agent-head">
+      <div>日期</div><div>客户</div><div>项目 / 交易</div><div>成交金额</div><div>上家成本</div>
+      <div>其他费用</div><div>佣金</div><div>实际利润</div><div>已收</div><div>未收</div>
+      <div>来源人</div><div>状态</div><div>操作</div>
+    </div>
+    <div id="agentList"></div>
+  </div>
+  <button id="addAgentBtn" class="btn primary invest-add" type="button">＋ 新增中介订单</button>
+</section>
+
+<section id="wealthPage" class="panel wealth-page" style="display:none">
+  <div class="panel-head">
+    <div><h2>财富分配</h2><div class="page-subtitle">每日收入 · 纯赚 · 资金分配</div></div>
+    <button id="wealthBackBtn" class="btn secondary" type="button">我的债务</button>
+  </div>
+
+  <div class="wealth-kpis">
+    <div><span>今日收入</span><strong id="wTodayIncome">RM 0.00</strong></div>
+    <div><span>今日支出</span><strong id="wTodayExpense">RM 0.00</strong></div>
+    <div class="wealth-main"><span>今日纯赚</span><strong id="wTodayNet">RM 0.00</strong></div>
+    <div><span>本月收入</span><strong id="wMonthIncome">RM 0.00</strong></div>
+    <div><span>本月纯赚</span><strong id="wMonthNet">RM 0.00</strong></div>
+    <div><span>今年纯赚</span><strong id="wYearNet">RM 0.00</strong></div>
+  </div>
+
+  <div class="allocation-settings">
+    <div class="allocation-title"><div><b>纯赚分配比例</b><small>总比例需要等于 100%</small></div><strong id="allocationTotal">100%</strong></div>
+    <div class="allocation-grid">
+      <label>投资<input id="pctInvest" type="number" min="0" max="100" value="30"><span>%</span></label>
+      <label>储蓄<input id="pctSave" type="number" min="0" max="100" value="30"><span>%</span></label>
+      <label>还债<input id="pctDebt" type="number" min="0" max="100" value="20"><span>%</span></label>
+      <label>可花<input id="pctSpend" type="number" min="0" max="100" value="10"><span>%</span></label>
+      <label>备用金<input id="pctReserve" type="number" min="0" max="100" value="10"><span>%</span></label>
+    </div>
+    <button id="saveAllocationBtn" class="btn primary" type="button">保存分配比例</button>
+  </div>
+
+  <div class="wealth-entry">
+    <div><label>日期</label><input id="wealthDate" type="date"></div>
+    <div><label>今日收入</label><input id="wealthIncome" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    <div><label>今日支出</label><input id="wealthExpense" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    <button id="addWealthRecordBtn" class="btn primary" type="button">加入记录</button>
+  </div>
+
+  <div class="wealth-table-wrap">
+    <div class="wealth-grid wealth-head">
+      <div>日期</div><div>收入</div><div>支出</div><div>纯赚</div><div>投资</div>
+      <div>储蓄</div><div>还债</div><div>可花</div><div>备用金</div><div>操作</div>
+    </div>
+    <div id="wealthList"></div>
+  </div>
+</section>
+
+<section id="receivablePage" class="panel receivable-page" style="display:none">
+  <div class="panel-head">
+    <div><h2>别人欠我的钱</h2><div class="page-subtitle">应收款 · 收款 · 逾期管理</div></div>
+    <button id="receivableBackBtn" class="btn secondary" type="button">我的债务</button>
+  </div>
+
+  <div class="receivable-summary">
+    <div><span>欠我总额</span><strong id="recTotal">RM 0.00</strong></div>
+    <div><span>已收回</span><strong id="recReceived">RM 0.00</strong></div>
+    <div><span>未收回</span><strong id="recOutstanding">RM 0.00</strong></div>
+    <div><span>欠款人数</span><strong id="recPeople">0</strong></div>
+    <div><span>逾期金额</span><strong id="recOverdue">RM 0.00</strong></div>
+  </div>
+
+  <div class="debt-toolbar">
+    <div class="toolbar-search"><span>⌕</span><input id="recSearch" type="search" placeholder="搜索欠款人 / 项目"></div>
+    <select id="recFilter"><option value="all">全部</option><option value="overdue">已逾期</option><option value="open">未结清</option><option value="done">已结清</option></select>
+  </div>
+  <div class="table-hint">左右滑动查看完整资料 →</div>
+
+  <div class="rec-table-wrap">
+    <div class="rec-grid rec-head">
+      <div>日期</div><div>截止日期</div><div>欠款人</div><div>项目</div>
+      <div>欠款总额</div><div>已收回</div><div>未收回</div><div>状态</div><div>操作</div>
+    </div>
+    <div id="receivableList"></div>
+  </div>
+  <button id="addReceivableBtn" class="btn primary invest-add" type="button">＋ 新增欠款</button>
+</section>
+
+<section id="investmentPage" class="panel investment-page" style="display:none">
+  <div class="panel-head">
+    <div>
+      <h2>投资表</h2>
+      <div class="page-subtitle">资金 · 投资 · 盈亏管理</div>
+    </div>
+    <button id="investmentBackBtn" class="btn secondary" type="button">债务表</button>
+  </div>
+
+  <div class="capital-editor">
+    <div>
+      <span>现有总资金</span>
+      <strong id="capitalDisplay">RM 0.00</strong>
+    </div>
+    <div class="capital-input-wrap">
+      <span>调整资金</span>
+      <input id="capitalInput" type="number" step="0.01" min="0" placeholder="输入总资金">
+      <button id="saveCapitalBtn" class="btn primary" type="button">保存</button>
+    </div>
+  </div>
+
+  <div class="investment-summary">
+    <div class="invest-summary-card"><span>现有总资金</span><strong id="investTotalCapital">RM 0.00</strong></div>
+    <div class="invest-summary-card"><span>已投入</span><strong id="investInvested">RM 0.00</strong></div>
+    <div class="invest-summary-card"><span>可用现金</span><strong id="investCash">RM 0.00</strong></div>
+    <div class="invest-summary-card"><span>当前投资总值</span><strong id="investValue">RM 0.00</strong></div>
+    <div class="invest-summary-card"><span>总盈利 / 亏损</span><strong id="investProfit">RM 0.00</strong></div>
+    <div class="invest-summary-card"><span>总回报率</span><strong id="investROI">0.00%</strong></div>
+  </div>
+
+  <div class="invest-table-wrap">
+    <div class="invest-table-head invest-grid">
+      <div>日期</div><div>投资项目</div><div>类型</div><div>投入金额</div>
+      <div>当前价值</div><div>盈利/亏损</div><div>回报率</div><div>状态</div><div>操作</div>
+    </div>
+    <div id="investmentList"></div>
+  </div>
+  <button id="addInvestmentBtn" class="btn primary invest-add" type="button">＋ 新增投资</button>
+</section>
+
+<div id="historyPage" class="hidden">
+          
+          <div id="historyList" class="history-list"></div>
+          <div id="historyEmpty" class="empty">还没有历史记录</div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <template id="projectTemplate">
+  <div class="project-row">
+    <div class="project-cell">
+      <label>日期</label>
+      <input class="project-created-date date-display" type="date">
+    </div>
+    <div class="project-cell due-cell">
+      <label>截止日期</label>
+      <input class="due-date" type="date">
+    </div>
+    <div class="project-cell">
+      <label>项目</label>
+      <input class="project-name" type="text" placeholder="项目">
+    </div>
+    <div class="project-cell">
+      <label>总债务</label>
+      <input class="project-price" type="number" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="project-cell">
+      <label>已还款</label>
+      <input class="project-deduct" type="number" min="0" step="0.01" placeholder="0.00">
+    </div>
+    <div class="project-cell remaining-cell">
+      <label>剩余</label>
+      <div class="remain">RM 0.00</div>
+    </div>
+    <button class="submit-project-btn" type="button" style="display:none">提交</button>
+    <button class="finish-btn" type="button">完成</button>
+    <button class="delete-btn" type="button" aria-label="删除" style="display:none">×</button>
+  </div>
+</template>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://plusrybqlfwgmguqhsnx.supabase.co";
+const SUPABASE_KEY = "sb_publishable_nvgOM36tptPGepF-_MouHQ_jeg55fec";
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = client;
+
+const $ = id => document.getElementById(id);
+const state = { user:null, data:{name:"", total:0, projects:[]} };
+let saveTimer = null;
+
+function formatRM(value){
+  const n = Number(value || 0);
+  return `RM ${n.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+}
+
+async function loadFinance(){
+  const email = state.user.email.toLowerCase();
+
+  const { data: rows, error } = await client
+    .from("leingbox_finance")
+    .select("person_name,total_amount,projects")
+    .eq("username", email)
+    .limit(1);
+
+  if(error) throw error;
+
+  if(!rows || !rows.length){
+    const { error: insertError } = await client
+      .from("leingbox_finance")
+      .insert({
+        username: email,
+        person_name: "",
+        total_amount: 0,
+        projects: []
+      });
+
+    if(insertError) throw insertError;
+    state.data = {name:"", total:0, projects:[]};
+    return;
+  }
+
+  const row = rows[0];
+  state.data = {
+    name: row.person_name || "",
+    total: Number(row.total_amount || 0),
+    projects: Array.isArray(row.projects) ? row.projects : []
+  };
+}
+
+async function saveNow(){
+  const email = state.user.email.toLowerCase();
+
+  const { error } = await client
+    .from("leingbox_finance")
+    .update({
+      person_name: state.data.name || "",
+      total_amount: Number(state.data.total || 0),
+      projects: state.data.projects,
+      updated_at: new Date().toISOString()
+    })
+    .eq("username", email);
+
+  if(error) throw error;
+}
+
+function save(){
+  render();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async()=>{
+    try{
+      await saveNow();
+    }catch(err){
+      console.error(err);
+      alert("云端保存失败，请检查网络后再试。");
+    }
+  },350);
+}
+
+function totals(){
+  const deduct = state.data.projects.reduce((sum,p)=>sum+Number(p.price||0),0);
+  return { deduct, balance:Number(state.data.total||0)-deduct };
+}
+
+function todayString(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+function formatDateShort(dateStr){
+  if(!dateStr) return "";
+  const [y,m,d] = dateStr.split("-");
+  return `${m}/${d}`;
+}
+
+function showProjectPage(){
+  $("projectPage").classList.remove("hidden");
+  $("historyPage").classList.add("hidden");
+  $("historyBtn").textContent = "历史记录";
+  sessionStorage.setItem("leingbox_view","projects");
+}
+
+function showHistoryPage(){
+  renderHistory();
+  $("projectPage").classList.add("hidden");
+  $("historyPage").classList.remove("hidden");
+  $("historyBtn").textContent = "项目";
+  sessionStorage.setItem("leingbox_view","history");
+}
+
+function renderHistory(){
+  const list = $("historyList");
+  const empty = $("historyEmpty");
+  if(!list || !empty) return;
+
+  const completed = state.data.projects
+    .map((p,index)=>({ ...p, _index:index }))
+    .filter(p => p.completed)
+    .sort((a,b)=>String(b.completed_at||"").localeCompare(String(a.completed_at||"")));
+
+  list.innerHTML = "";
+  empty.style.display = completed.length ? "none" : "block";
+
+  const groups = {};
+  completed.forEach(p=>{
+    const month = p.completed_at ? p.completed_at.slice(0,7) : "未注明";
+    (groups[month] ||= []).push(p);
+  });
+
+  Object.keys(groups).sort((a,b)=>b.localeCompare(a)).forEach(month=>{
+    const wrap = document.createElement("div");
+    wrap.className = "history-month";
+
+    const title = document.createElement("h3");
+    title.textContent = month === "未注明" ? "未注明" : month.replace("-", " / ");
+    wrap.appendChild(title);
+
+    groups[month].forEach(p=>{
+      const row = document.createElement("div");
+      row.className = "history-view-row";
+
+      const remaining = Number(p.price||0) - Number(p.deduct||0);
+
+      row.innerHTML = `
+        <div>${formatDateShort(p.completed_at)}</div>
+        <div>${p.name || "—"}</div>
+        <div>价格<br>${formatRM(p.price||0)}</div>
+        <div>➖价格<br>${formatRM(p.deduct||0)}</div>
+        <div class="${remaining < 0 ? "negative" : ""}">剩余<br>${formatRM(remaining)}</div>
+        <button class="history-pencil history-action" type="button" aria-label="编辑">✎</button>
+        <button class="history-return history-action" type="button" aria-label="放回项目">↩</button>
+        <button class="history-delete history-action" type="button" aria-label="删除">×</button>
+      `;
+
+      row.querySelector(".history-pencil").addEventListener("click",()=>{
+        showHistoryEditor(wrap, row, p);
+      });
+
+      row.querySelector(".history-return").addEventListener("click", async ()=>{
+        if(!confirm("确定把这笔历史记录放回项目吗？")) return;
+
+        const idx = p._index;
+        state.data.projects[idx].completed = false;
+        state.data.projects[idx].completed_at = null;
+
+        try{
+          await saveNow();
+          render();
+          showProjectPage();
+        }catch(err){
+          console.error(err);
+          state.data.projects[idx].completed = true;
+          state.data.projects[idx].completed_at = p.completed_at;
+          alert("保存失败，请检查网络后再试。");
+        }
+      });
+
+      row.querySelector(".history-delete").addEventListener("click", async ()=>{
+        if(!confirm("确定永久删除这笔历史记录吗？")) return;
+
+        const idx = p._index;
+        const removed = state.data.projects.splice(idx,1)[0];
+
+        try{
+          await saveNow();
+          renderHistory();
+        }catch(err){
+          console.error(err);
+          state.data.projects.splice(idx,0,removed);
+          alert("删除失败，请检查网络后再试。");
+        }
+      });
+
+      wrap.appendChild(row);
+    });
+
+    list.appendChild(wrap);
+  });
+}
+
+function showHistoryEditor(wrap, oldRow, item){
+  const editor = document.createElement("div");
+  editor.className = "history-edit-row";
+
+  editor.innerHTML = `
+    <input class="h-date" type="date" value="${item.completed_at || todayString()}">
+    <input class="h-name" type="text" value="${String(item.name||"").replace(/"/g,"&quot;")}" placeholder="项目">
+    <input class="h-price" type="number" min="0" step="0.01" value="${Number(item.price||0)}">
+    <input class="h-deduct" type="number" min="0" step="0.01" value="${Number(item.deduct||0)}">
+    <div class="history-remain"></div>
+    <button class="h-save btn primary" type="button">提交</button>
+    <button class="h-cancel btn secondary" type="button">取消</button>
+  `;
+
+  oldRow.replaceWith(editor);
+
+  const date = editor.querySelector(".h-date");
+  const name = editor.querySelector(".h-name");
+  const price = editor.querySelector(".h-price");
+  const deduct = editor.querySelector(".h-deduct");
+  const remain = editor.querySelector(".history-remain");
+
+  const calc = ()=>{
+    const left = Number(price.value||0) - Number(deduct.value||0);
+    remain.textContent = formatRM(left);
+    remain.classList.toggle("negative", left < 0);
+  };
+  calc();
+  price.addEventListener("input",calc);
+  deduct.addEventListener("input",calc);
+
+  editor.querySelector(".h-cancel").addEventListener("click",renderHistory);
+
+  editor.querySelector(".h-save").addEventListener("click", async ()=>{
+    const idx = item._index;
+
+    state.data.projects[idx].completed_at = date.value || item.completed_at || todayString();
+    state.data.projects[idx].name = name.value;
+    state.data.projects[idx].price = Number(price.value||0);
+    state.data.projects[idx].deduct = Number(deduct.value||0);
+
+    const btn = editor.querySelector(".h-save");
+    btn.disabled = true;
+    btn.textContent = "保存中";
+
+    try{
+      await saveNow();
+      renderHistory();
+    }catch(err){
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = "重试";
+      alert("保存失败，请检查网络后再试。");
+    }
+  });
+}
+
+function updateProjectSummary(){
+  let totalPrice=0,totalDeduct=0,active=0,done=0,dueSoon=0,overdue=0;
+  const today=new Date(); today.setHours(0,0,0,0);
+
+  (state.data.projects||[]).forEach(p=>{
+    if(p.completed){ done++; return; }
+    active++;
+    totalPrice+=Number(p.price||0);
+    totalDeduct+=Number(p.deduct||0);
+    if(p.due_date){
+      const d=new Date(p.due_date+"T00:00:00");
+      const days=Math.ceil((d-today)/86400000);
+      if(days<0) overdue++;
+      else if(days<=7) dueSoon++;
+    }
+  });
+
+  const remaining=totalPrice-totalDeduct;
+  const paidRate=totalPrice>0?Math.max(0,Math.min(100,(totalDeduct/totalPrice)*100)):0;
+  const priceEl=$("summaryPrice"), deductEl=$("summaryDeduct"), remainingEl=$("summaryRemaining");
+  if(priceEl) priceEl.textContent=formatRM(totalPrice);
+  if(deductEl) deductEl.textContent=formatRM(totalDeduct);
+  if(remainingEl){
+    const a=Math.abs(remaining);
+    remainingEl.textContent=remaining<0?`-RM ${a.toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})}`:formatRM(remaining);
+    remainingEl.classList.toggle("negative",remaining<0);
+  }
+  if($("summaryProgressText")) $("summaryProgressText").textContent=`${paidRate.toFixed(0)}% 已还`;
+  if($("summaryProgressBar")) $("summaryProgressBar").style.width=`${paidRate}%`;
+  if($("summaryActive")) $("summaryActive").textContent=active;
+  if($("summaryDone")) $("summaryDone").textContent=done;
+  if($("summaryDueSoon")) $("summaryDueSoon").textContent=dueSoon;
+  if($("summaryOverdue")) $("summaryOverdue").textContent=overdue;
+}
+
+function render(){
+  const t = totals();
+
+  const list = $("projectList");
+  list.innerHTML = "";
+  $("emptyText").style.display = state.data.projects.some(p=>!p.completed) ? "none" : "block";
+
+  state.data.projects.forEach((project,index)=>{
+    if(project.completed) return;
+
+    const row = $("projectTemplate").content.firstElementChild.cloneNode(true);
+    const name = row.querySelector(".project-name");
+    const createdDate = row.querySelector(".project-created-date");
+    const price = row.querySelector(".project-price");
+    const deduct = row.querySelector(".project-deduct");
+    const dueDate = row.querySelector(".due-date");
+    const remain = row.querySelector(".remain");
+    const finish = row.querySelector(".finish-btn");
+    const del = row.querySelector(".delete-btn");
+
+    name.value = project.name || "";
+    if(!project.project_date) project.project_date = todayString();
+    createdDate.value = project.project_date;
+    price.value = project.price ?? "";
+    deduct.value = project.deduct ?? "";
+    dueDate.value = project.due_date || "";
+    if(project.due_date){
+      const td=new Date(); td.setHours(0,0,0,0);
+      const dd=new Date(project.due_date+"T00:00:00");
+      const days=Math.ceil((dd-td)/86400000);
+      row.classList.toggle("is-overdue",days<0);
+      row.classList.toggle("is-due-soon",days>=0 && days<=7);
+    }
+
+    let autoCompleting = false;
+
+    const updateRemain = async ()=>{
+      const priceValue = Number(price.value || 0);
+      const deductValue = Number(deduct.value || 0);
+      const remaining = priceValue - deductValue;
+      remain.textContent = formatRM(remaining);
+      remain.classList.toggle("negative", remaining < 0);
+
+      if(!autoCompleting && !project.completed && priceValue > 0 && remaining === 0){
+        autoCompleting = true;
+        project.name = name.value;
+        project.price = priceValue;
+        project.deduct = deductValue;
+        project.due_date = dueDate.value || null;
+        project.completed = true;
+        project.completed_at = project.project_date || todayString();
+        try{
+          await saveNow();
+          render();
+          showHistoryPage();
+        }catch(err){
+          console.error(err);
+          project.completed = false;
+          project.completed_at = null;
+          autoCompleting = false;
+          alert("自动完成保存失败，请检查网络后再试。");
+        }
+      }
+    };
+
+    const saveRow = async ()=>{
+      project.name = name.value;
+      project.project_date = createdDate.value || todayString();
+      project.price = Number(price.value || 0);
+      project.deduct = Number(deduct.value || 0);
+      project.due_date = dueDate.value || null;
+      try{ await saveNow(); }
+      catch(err){ console.error(err); alert("保存失败，请检查网络后再试。"); }
+    };
+
+    price.addEventListener("input", ()=>{
+      project.price = Number(price.value || 0);
+      updateRemain();
+      updateProjectSummary();
+    });
+    deduct.addEventListener("input", ()=>{
+      project.deduct = Number(deduct.value || 0);
+      updateRemain();
+      updateProjectSummary();
+    });
+    name.addEventListener("change", saveRow);
+    price.addEventListener("change", saveRow);
+    deduct.addEventListener("change", saveRow);
+    createdDate.addEventListener("change", saveRow);
+    dueDate.addEventListener("change", saveRow);
+
+    finish.addEventListener("click", async ()=>{
+      project.name = name.value;
+      project.project_date = createdDate.value || todayString();
+      project.price = Number(price.value || 0);
+      project.deduct = Number(deduct.value || 0);
+      project.due_date = dueDate.value || null;
+      project.completed = true;
+      project.completed_at = project.project_date || todayString();
+      finish.disabled = true;
+      try{
+        await saveNow();
+        render();
+        showHistoryPage();
+      }catch(err){
+        console.error(err);
+        project.completed = false;
+        project.completed_at = null;
+        finish.disabled = false;
+        alert("保存失败，请检查网络后再试。");
+      }
+    });
+
+    del.addEventListener("click",()=>{
+      if(confirm("确定删除这个项目吗？")){
+        state.data.projects.splice(index,1);
+        render();
+        saveNow().catch(console.error);
+      }
+    });
+
+    updateRemain();
+    list.appendChild(row);
+  });
+
+  updateProjectSummary();
+}
+
+async function showApp(user){
+  state.user = user;
+  await loadFinance();
+  $("loginPage").classList.add("hidden");
+  $("financePage").classList.remove("hidden");
+  $("password").value = "";
+  $("loginError").textContent = "";
+  render();
+  if(sessionStorage.getItem("leingbox_view")==="history") showHistoryPage();
+  else showProjectPage();
+}
+
+async function doLogin(){
+  const email = $("username").value.trim().toLowerCase();
+  const password = $("password").value;
+  const errorBox = $("loginError");
+
+  if(!email || !password){
+    errorBox.textContent = "请输入 Email 和 Password。";
+    return;
+  }
+
+  errorBox.textContent = "正在登录...";
+
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
+
+  if(error || !data.user){
+    console.error(error);
+    errorBox.textContent = "Email 或 Password 不正确。";
+    return;
+  }
+
+  try{
+    await showApp(data.user);
+  }catch(err){
+    console.error(err);
+    errorBox.textContent = "登录成功，但读取资料失败。";
+  }
+}
+
+$("loginBtn").addEventListener("click", doLogin);
+$("password").addEventListener("keydown", e=>{
+  if(e.key === "Enter") doLogin();
+});
+
+$("forgotPasswordBtn").addEventListener("click", async ()=>{
+  const email = $("username").value.trim().toLowerCase();
+  const errorBox = $("loginError");
+
+  if(!email || !email.includes("@")){
+    errorBox.textContent = "请先输入 Email。";
+    return;
+  }
+
+  errorBox.textContent = "正在发送重设密码邮件...";
+
+  const redirectTo = `${window.location.origin}${window.location.pathname}`;
+  const { error } = await client.auth.resetPasswordForEmail(email,{ redirectTo });
+
+  if(error){
+    console.error(error);
+    const code = error?.code ? ` (${error.code})` : "";
+    errorBox.textContent = `暂时无法发送重设邮件${code}。请稍后再试。`;
+    return;
+  }
+
+  errorBox.textContent = "重设密码邮件已发送，请检查 Email。";
+});
+
+$("logoutBtn").addEventListener("click", async ()=>{
+  await client.auth.signOut();
+  state.user = null;
+  $("financePage").classList.add("hidden");
+  $("loginPage").classList.remove("hidden");
+  $("username").value = "";
+  $("password").value = "";
+});
+
+$("historyBtn").addEventListener("click", ()=>{
+  if(!$("historyPage").classList.contains("hidden")) showProjectPage();
+  else showHistoryPage();
+});
+
+$("addProjectBtn").addEventListener("click",()=>{
+  state.data.projects.push({name:"",price:0,deduct:0,due_date:null,project_date:todayString(),completed:false,completed_at:null});
+  render();
+  setTimeout(()=>{
+    const inputs = document.querySelectorAll(".project-name");
+    inputs[inputs.length-1]?.focus();
+  },0);
+});
+
+client.auth.onAuthStateChange(async(event,session)=>{
+  if(event==="PASSWORD_RECOVERY"){
+    setTimeout(async()=>{
+      const p1 = prompt("请输入新密码（至少 6 个字符）：");
+      if(p1===null) return;
+      if(p1.length<6){ alert("密码至少需要 6 个字符。"); return; }
+
+      const p2 = prompt("请再次输入新密码：");
+      if(p2!==p1){ alert("两次输入的密码不一致。"); return; }
+
+      const { error } = await client.auth.updateUser({password:p1});
+      if(error){
+        console.error(error);
+        alert("密码更新失败，请重新打开邮件链接再试。");
+        return;
+      }
+
+      alert("密码已更新。");
+      window.history.replaceState({},document.title,window.location.pathname);
+    },300);
+  }
+});
+
+(async function init(){
+  const { data:{session} } = await client.auth.getSession();
+  if(session?.user){
+    try{
+      await showApp(session.user);
+    }catch(err){
+      console.error(err);
+    }
+  }
+})();
+</script>
+
+<script>
+function applyDebtViewFilter(){
+  const q=($("debtSearch")?.value||"").trim().toLowerCase();
+  const f=$("debtFilter")?.value||"all";
+  document.querySelectorAll("#projectList .project-row").forEach(row=>{
+    const name=(row.querySelector(".project-name")?.value||"").toLowerCase();
+    const statusOK=f==="all" || (f==="overdue"&&row.classList.contains("is-overdue")) || (f==="soon"&&row.classList.contains("is-due-soon"));
+    row.style.display=(!q||name.includes(q))&&statusOK?"":"none";
+  });
+}
+document.addEventListener("input",e=>{
+  if(e.target?.id==="debtSearch") applyDebtViewFilter();
+});
+document.addEventListener("change",e=>{
+  if(e.target?.id==="debtFilter") applyDebtViewFilter();
+});
+</script>
+<script>
+let investState={capital:0,investments:[]};
+
+async function loadInvestmentData(){
+  try{
+    const userRes=await supabase.auth.getUser();
+    const email=userRes?.data?.user?.email;
+    if(!email){ renderInvestments(); return; }
+
+    const {data,error}=await supabase
+      .from("leingbox_investments")
+      .select("capital, investments")
+      .eq("username",email)
+      .maybeSingle();
+
+    if(error) throw error;
+    if(data){
+      investState.capital=Number(data.capital||0);
+      investState.investments=Array.isArray(data.investments)?data.investments:[];
+    }else{
+      const {error:insertError}=await supabase
+        .from("leingbox_investments")
+        .insert({username:email,capital:0,investments:[]});
+      if(insertError) throw insertError;
+    }
+  }catch(e){
+    console.error("Load investment data:",e);
+    alert("投资资料读取失败，请确认已经运行投资表 SQL。");
+  }
+  renderInvestments();
+}
+
+async function saveInvestmentData(){
+  try{
+    const userRes=await supabase.auth.getUser();
+    const email=userRes?.data?.user?.email;
+    if(!email) return false;
+
+    const {error}=await supabase
+      .from("leingbox_investments")
+      .upsert({
+        username:email,
+        capital:Number(investState.capital||0),
+        investments:investState.investments,
+        updated_at:new Date().toISOString()
+      },{onConflict:"username"});
+
+    if(error) throw error;
+    return true;
+  }catch(e){
+    console.error("Save investment data:",e);
+    alert("投资资料保存失败，请确认已经运行投资表 SQL。");
+    return false;
+  }
+}
+function invMoney(n){
+  return `RM ${Number(n||0).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+}
+function investmentSummary(){
+  const active=investState.investments.filter(x=>x.status!=="退出");
+  const invested=active.reduce((a,x)=>a+Number(x.amount||0),0);
+  const value=active.reduce((a,x)=>a+Number(x.value||0),0);
+  const profit=value-invested;
+  const cash=Number(investState.capital||0)-invested;
+  const roi=invested?profit/invested*100:0;
+  document.getElementById("capitalDisplay").textContent=invMoney(investState.capital);
+  document.getElementById("investTotalCapital").textContent=invMoney(investState.capital);
+  document.getElementById("investInvested").textContent=invMoney(invested);
+  document.getElementById("investCash").textContent=invMoney(cash);
+  document.getElementById("investValue").textContent=invMoney(value);
+  const p=document.getElementById("investProfit");
+  p.textContent=(profit<0?"-":"")+invMoney(Math.abs(profit));
+  p.className=profit<0?"profit-negative":profit>0?"profit-positive":"";
+  document.getElementById("investROI").textContent=`${roi.toFixed(2)}%`;
+}
+function renderInvestments(){
+  const list=document.getElementById("investmentList");
+  if(!list)return;
+  list.innerHTML="";
+  investState.investments.forEach((x,i)=>{
+    const profit=Number(x.value||0)-Number(x.amount||0);
+    const roi=Number(x.amount||0)?profit/Number(x.amount)*100:0;
+    const row=document.createElement("div");
+    row.className="invest-row invest-grid";
+    row.innerHTML=`
+      <div><input class="inv-date" type="date" value="${x.date||""}"></div>
+      <div><input class="inv-name" type="text" value="${String(x.name||"").replace(/"/g,"&quot;")}" placeholder="投资项目"></div>
+      <div><select class="inv-type">
+        ${["股票","基金","定存","房产","生意","黄金","其他"].map(v=>`<option ${x.type===v?"selected":""}>${v}</option>`).join("")}
+      </select></div>
+      <div><input class="inv-amount" type="number" step="0.01" min="0" value="${Number(x.amount||0)}"></div>
+      <div><input class="inv-value" type="number" step="0.01" min="0" value="${Number(x.value||0)}"></div>
+      <div class="invest-calc">${profit<0?"-":""}${invMoney(Math.abs(profit))}</div>
+      <div class="invest-calc">${roi.toFixed(2)}%</div>
+      <div><select class="inv-status"><option ${x.status==="持有中"?"selected":""}>持有中</option><option ${x.status==="退出"?"selected":""}>退出</option></select></div>
+      <div class="invest-actions"><button class="invest-save">保存</button><button class="invest-delete">删除</button></div>`;
+    row.querySelector(".invest-save").onclick=async()=>{
+      x.date=row.querySelector(".inv-date").value;
+      x.name=row.querySelector(".inv-name").value.trim();
+      x.type=row.querySelector(".inv-type").value;
+      x.amount=Number(row.querySelector(".inv-amount").value||0);
+      x.value=Number(row.querySelector(".inv-value").value||0);
+      x.status=row.querySelector(".inv-status").value;
+      await saveInvestmentData();renderInvestments();
+    };
+    row.querySelector(".invest-delete").onclick=async()=>{
+      if(confirm("确定删除这笔投资？")){
+        investState.investments.splice(i,1);await saveInvestmentData();renderInvestments();
+      }
+    };
+    list.appendChild(row);
+  });
+  investmentSummary();
+}
+document.addEventListener("click",async e=>{
+  if(e.target?.id==="investmentBtn"){
+    const pp=document.getElementById("projectPage"), hp=document.getElementById("historyPage"), ip=document.getElementById("investmentPage");
+    if(pp)pp.style.display="none"; if(hp)hp.style.display="none"; if(ip)ip.style.display="";
+    loadInvestmentData();
+  }
+  if(e.target?.id==="investmentBackBtn"){
+    const pp=document.getElementById("projectPage"), ip=document.getElementById("investmentPage");
+    if(ip)ip.style.display="none"; if(pp)pp.style.display="";
+  }
+  if(e.target?.id==="saveCapitalBtn"){
+    investState.capital=Number(document.getElementById("capitalInput").value||0);
+    await saveInvestmentData();investmentSummary();
+  }
+  if(e.target?.id==="addInvestmentBtn"){
+    const today=new Date().toISOString().slice(0,10);
+    investState.investments.push({date:today,name:"",type:"其他",amount:0,value:0,status:"持有中"});
+    await saveInvestmentData();renderInvestments();
+  }
+});
+</script>
+<script>
+let receivableState={items:[]};
+
+async function loadReceivables(){
+  try{
+    const ur=await supabase.auth.getUser(), email=ur?.data?.user?.email;
+    if(!email){renderReceivables();return;}
+    const {data,error}=await supabase.from("leingbox_receivables").select("receivables").eq("username",email).maybeSingle();
+    if(error)throw error;
+    if(data) receivableState.items=Array.isArray(data.receivables)?data.receivables:[];
+    else{
+      const {error:ie}=await supabase.from("leingbox_receivables").insert({username:email,receivables:[]});
+      if(ie)throw ie;
+    }
+  }catch(e){console.error(e);alert("别人欠我资料读取失败，请先运行 Receivables SQL。");}
+  renderReceivables();
+}
+async function saveReceivables(){
+  try{
+    const ur=await supabase.auth.getUser(),email=ur?.data?.user?.email;if(!email)return false;
+    const {error}=await supabase.from("leingbox_receivables").upsert({username:email,receivables:receivableState.items,updated_at:new Date().toISOString()},{onConflict:"username"});
+    if(error)throw error;return true;
+  }catch(e){console.error(e);alert("别人欠我资料保存失败：" + (e?.message || e));return false;}
+}
+function recSummary(){
+  let total=0,received=0,outstanding=0,overdue=0;const people=new Set();
+  const t=new Date();t.setHours(0,0,0,0);
+  receivableState.items.forEach(x=>{
+    total+=Number(x.total||0);received+=Number(x.received||0);
+    const rem=Math.max(0,Number(x.total||0)-Number(x.received||0));outstanding+=rem;
+    if(x.person&&rem>0)people.add(x.person.trim().toLowerCase());
+    if(rem>0&&x.due){const d=new Date(x.due+"T00:00:00");if(d<t)overdue+=rem;}
+  });
+  document.getElementById("recTotal").textContent=invMoney(total);
+  document.getElementById("recReceived").textContent=invMoney(received);
+  document.getElementById("recOutstanding").textContent=invMoney(outstanding);
+  document.getElementById("recPeople").textContent=people.size;
+  document.getElementById("recOverdue").textContent=invMoney(overdue);
+}
+function renderReceivables(){
+  const list=document.getElementById("receivableList");if(!list)return;list.innerHTML="";
+  const today=new Date();today.setHours(0,0,0,0);
+  receivableState.items.forEach((x,i)=>{
+    const rem=Math.max(0,Number(x.total||0)-Number(x.received||0));
+    const overdue=rem>0&&x.due&&new Date(x.due+"T00:00:00")<today;
+    const row=document.createElement("div");row.className="rec-row rec-grid"+(overdue?" rec-overdue":"");
+    row.dataset.overdue=overdue?"1":"0";row.dataset.done=rem<=0?"1":"0";
+    row.innerHTML=`
+      <div><input class="r-date" type="date" value="${x.date||""}"></div>
+      <div><input class="r-due" type="date" value="${x.due||""}"></div>
+      <div><input class="r-person" value="${String(x.person||"").replace(/"/g,"&quot;")}" placeholder="名字"></div>
+      <div><input class="r-project" value="${String(x.project||"").replace(/"/g,"&quot;")}" placeholder="项目"></div>
+      <div><input class="r-total" type="number" step="0.01" min="0" value="${Number(x.total||0)}"></div>
+      <div><input class="r-received" type="number" step="0.01" min="0" value="${Number(x.received||0)}"></div>
+      <div class="rec-calc">${invMoney(rem)}</div>
+      <div class="rec-calc">${rem<=0?"已结清":overdue?"已逾期":"未结清"}</div>
+      <div class="rec-actions"><button class="rec-save">保存</button><button class="rec-delete">删除</button></div>`;
+    row.querySelector(".rec-save").onclick=async()=>{
+      x.date=row.querySelector(".r-date").value;x.due=row.querySelector(".r-due").value;
+      x.person=row.querySelector(".r-person").value.trim();x.project=row.querySelector(".r-project").value.trim();
+      x.total=Number(row.querySelector(".r-total").value||0);x.received=Number(row.querySelector(".r-received").value||0);
+      await saveReceivables();renderReceivables();
+    };
+    row.querySelector(".rec-delete").onclick=async()=>{if(confirm("确定删除这笔欠款？")){receivableState.items.splice(i,1);await saveReceivables();renderReceivables();}};
+    list.appendChild(row);
+  });recSummary();applyRecFilter();
+}
+function applyRecFilter(){
+  const q=(document.getElementById("recSearch")?.value||"").toLowerCase(),f=document.getElementById("recFilter")?.value||"all";
+  document.querySelectorAll("#receivableList .rec-row").forEach(r=>{
+    const text=((r.querySelector(".r-person")?.value||"")+" "+(r.querySelector(".r-project")?.value||"")).toLowerCase();
+    const ok=f==="all"||(f==="overdue"&&r.dataset.overdue==="1")||(f==="done"&&r.dataset.done==="1")||(f==="open"&&r.dataset.done!=="1");
+    r.style.display=(!q||text.includes(q))&&ok?"":"none";
+  });
+}
+document.addEventListener("input",e=>{if(e.target?.id==="recSearch")applyRecFilter();});
+document.addEventListener("change",e=>{if(e.target?.id==="recFilter")applyRecFilter();});
+document.addEventListener("click",async e=>{
+  if(e.target?.id==="receivableBtn"){
+    ["projectPage","historyPage","investmentPage"].forEach(id=>{const x=document.getElementById(id);if(x)x.style.display="none";});
+    document.getElementById("receivablePage").style.display="";await loadReceivables();
+  }
+  if(e.target?.id==="receivableBackBtn"){
+    document.getElementById("receivablePage").style.display="none";
+    const p=document.getElementById("projectPage");if(p)p.style.display="";
+  }
+  if(e.target?.id==="addReceivableBtn"){
+    receivableState.items.push({date:new Date().toISOString().slice(0,10),due:"",person:"",project:"",total:0,received:0});
+    await saveReceivables();renderReceivables();
+  }
+});
+</script>
+<script>
+let wealthState={settings:{invest:30,save:30,debt:20,spend:10,reserve:10},records:[]};
+
+async function loadWealth(){
+  try{
+    const ur=await supabase.auth.getUser(),email=ur?.data?.user?.email;if(!email){renderWealth();return;}
+    const {data,error}=await supabase.from("leingbox_wealth").select("settings,records").eq("username",email).maybeSingle();
+    if(error)throw error;
+    if(data){
+      if(data.settings)wealthState.settings={...wealthState.settings,...data.settings};
+      wealthState.records=Array.isArray(data.records)?data.records:[];
+    }else{
+      const {error:ie}=await supabase.from("leingbox_wealth").insert({username:email,settings:wealthState.settings,records:[]});
+      if(ie)throw ie;
+    }
+  }catch(e){console.error(e);alert("财富分配资料读取失败，请先运行 Wealth SQL。");}
+  renderWealth();
+}
+async function saveWealth(){
+  try{
+    const ur=await supabase.auth.getUser(),email=ur?.data?.user?.email;if(!email)return false;
+    const {error}=await supabase.from("leingbox_wealth").upsert({username:email,settings:wealthState.settings,records:wealthState.records,updated_at:new Date().toISOString()},{onConflict:"username"});
+    if(error)throw error;return true;
+  }catch(e){console.error(e);alert("财富分配资料保存失败：" + (e?.message || e));return false;}
+}
+function wealthCalcRecord(r){
+  const net=Number(r.income||0)-Number(r.expense||0),s=r.settings||wealthState.settings;
+  return {net,invest:net*Number(s.invest||0)/100,save:net*Number(s.save||0)/100,debt:net*Number(s.debt||0)/100,spend:net*Number(s.spend||0)/100,reserve:net*Number(s.reserve||0)/100};
+}
+function renderWealth(){
+  const st=wealthState.settings;
+  [["pctInvest","invest"],["pctSave","save"],["pctDebt","debt"],["pctSpend","spend"],["pctReserve","reserve"]].forEach(([id,k])=>{const e=document.getElementById(id);if(e)e.value=st[k];});
+  const total=Object.values(st).reduce((a,v)=>a+Number(v||0),0);
+  const at=document.getElementById("allocationTotal");if(at){at.textContent=total+"%";at.style.color=total===100?"":"#b42318";}
+  const list=document.getElementById("wealthList");if(!list)return;list.innerHTML="";
+  wealthState.records.sort((a,b)=>(b.date||"").localeCompare(a.date||"")).forEach((r,i)=>{
+    const c=wealthCalcRecord(r),row=document.createElement("div");row.className="wealth-row wealth-grid";
+    const cell=n=>`${n<0?"-":""}${invMoney(Math.abs(n))}`;
+    row.innerHTML=`<div>${r.date||""}</div><div>${invMoney(r.income)}</div><div>${invMoney(r.expense)}</div><div class="net ${c.net<0?"negative":""}">${cell(c.net)}</div><div>${cell(c.invest)}</div><div>${cell(c.save)}</div><div>${cell(c.debt)}</div><div>${cell(c.spend)}</div><div>${cell(c.reserve)}</div><div><button class="wealth-delete">删除</button></div>`;
+    row.querySelector(".wealth-delete").onclick=async()=>{if(confirm("确定删除这一天记录？")){wealthState.records.splice(i,1);await saveWealth();renderWealth();}};
+    list.appendChild(row);
+  });
+  wealthSummary();
+}
+function wealthSummary(){
+  const now=new Date(),today=now.toISOString().slice(0,10),month=today.slice(0,7),year=today.slice(0,4);
+  let ti=0,te=0,mi=0,mn=0,yn=0;
+  wealthState.records.forEach(r=>{
+    const inc=Number(r.income||0),exp=Number(r.expense||0),net=inc-exp;
+    if(r.date===today){ti+=inc;te+=exp}
+    if((r.date||"").startsWith(month)){mi+=inc;mn+=net}
+    if((r.date||"").startsWith(year))yn+=net;
+  });
+  document.getElementById("wTodayIncome").textContent=invMoney(ti);
+  document.getElementById("wTodayExpense").textContent=invMoney(te);
+  document.getElementById("wTodayNet").textContent=(ti-te<0?"-":"")+invMoney(Math.abs(ti-te));
+  document.getElementById("wMonthIncome").textContent=invMoney(mi);
+  document.getElementById("wMonthNet").textContent=(mn<0?"-":"")+invMoney(Math.abs(mn));
+  document.getElementById("wYearNet").textContent=(yn<0?"-":"")+invMoney(Math.abs(yn));
+}
+document.addEventListener("click",async e=>{
+  if(e.target?.id==="wealthBtn"){
+    ["projectPage","historyPage","investmentPage","receivablePage"].forEach(id=>{const x=document.getElementById(id);if(x)x.style.display="none";});
+    document.getElementById("wealthPage").style.display="";
+    document.getElementById("wealthDate").value=new Date().toISOString().slice(0,10);
+    await loadWealth();
+  }
+  if(e.target?.id==="wealthBackBtn"){
+    document.getElementById("wealthPage").style.display="none";const p=document.getElementById("projectPage");if(p)p.style.display="";
+  }
+  if(e.target?.id==="saveAllocationBtn"){
+    const st={invest:Number(document.getElementById("pctInvest").value||0),save:Number(document.getElementById("pctSave").value||0),debt:Number(document.getElementById("pctDebt").value||0),spend:Number(document.getElementById("pctSpend").value||0),reserve:Number(document.getElementById("pctReserve").value||0)};
+    if(Object.values(st).reduce((a,v)=>a+v,0)!==100){alert("分配比例总数必须是 100%。");return;}
+    wealthState.settings=st;await saveWealth();renderWealth();
+  }
+  if(e.target?.id==="addWealthRecordBtn"){
+    const date=document.getElementById("wealthDate").value,income=Number(document.getElementById("wealthIncome").value||0),expense=Number(document.getElementById("wealthExpense").value||0);
+    if(!date){alert("请选择日期。");return;}
+    wealthState.records.push({date,income,expense,settings:{...wealthState.settings}});
+    await saveWealth();document.getElementById("wealthIncome").value="";document.getElementById("wealthExpense").value="";renderWealth();
+  }
+});
+</script>
+<script>
+let agentState={items:[]};
+async function loadAgent(){
+  try{
+    const ur=await supabase.auth.getUser(),email=ur?.data?.user?.email;if(!email){renderAgent();return;}
+    const {data,error}=await supabase.from("leingbox_agent").select("orders").eq("username",email).maybeSingle();
+    if(error)throw error;
+    if(data)agentState.items=Array.isArray(data.orders)?data.orders:[];
+    else{const {error:ie}=await supabase.from("leingbox_agent").insert({username:email,orders:[]});if(ie)throw ie;}
+  }catch(e){console.error(e);alert("中介业务资料读取失败，请先运行 Agent SQL。");}
+  renderAgent();
+}
+async function saveAgent(){
+  try{
+    const ur=await supabase.auth.getUser(),email=ur?.data?.user?.email;if(!email)return false;
+    const {error}=await supabase.from("leingbox_agent").upsert({username:email,orders:agentState.items,updated_at:new Date().toISOString()},{onConflict:"username"});
+    if(error)throw error;return true;
+  }catch(e){console.error(e);alert("中介业务资料保存失败：" + (e?.message || e));return false;}
+}
+function agentNumbers(x){
+  const sales=Number(x.sales||0),cost=Number(x.cost||0),fees=Number(x.fees||0);
+  const autoProfit=sales-cost-fees;
+  const commission=x.commissionMode==="manual"?Number(x.commission||0):autoProfit;
+  const received=Number(x.received||0);
+  return {sales,cost,fees,commission,profit:autoProfit,received,outstanding:Math.max(0,commission-received)};
+}
+function agentSummary(){
+  const month=new Date().toISOString().slice(0,7);let sales=0,comm=0,profit=0,received=0,outstanding=0,open=0,done=0;
+  agentState.items.forEach(x=>{
+    const n=agentNumbers(x);
+    if((x.date||"").startsWith(month)){sales+=n.sales;comm+=n.commission;profit+=n.profit}
+    received+=n.received;outstanding+=n.outstanding;x.status==="已完成"?done++:open++;
+  });
+  document.getElementById("aMonthSales").textContent=invMoney(sales);
+  document.getElementById("aMonthCommission").textContent=(comm<0?"-":"")+invMoney(Math.abs(comm));
+  document.getElementById("aMonthProfit").textContent=(profit<0?"-":"")+invMoney(Math.abs(profit));
+  document.getElementById("aReceived").textContent=invMoney(received);
+  document.getElementById("aOutstanding").textContent=invMoney(outstanding);
+  document.getElementById("aStatusCount").textContent=`${open} / ${done}`;
+}
+function renderAgent(){
+  const list=document.getElementById("agentList");if(!list)return;list.innerHTML="";
+  agentState.items.forEach((x,i)=>{
+    const n=agentNumbers(x),row=document.createElement("div");row.className="agent-row agent-grid";
+    row.dataset.done=x.status==="已完成"?"1":"0";row.dataset.unpaid=n.outstanding>0?"1":"0";
+    const money=v=>(v<0?"-":"")+invMoney(Math.abs(v));
+    row.innerHTML=`
+      <div><input class="a-date" type="date" value="${x.date||""}"></div>
+      <div><input class="a-client" value="${String(x.client||"").replace(/"/g,"&quot;")}" placeholder="客户"></div>
+      <div><input class="a-project" value="${String(x.project||"").replace(/"/g,"&quot;")}" placeholder="项目"></div>
+      <div><input class="a-sales" type="number" step="0.01" min="0" value="${n.sales}"></div>
+      <div><input class="a-cost" type="number" step="0.01" min="0" value="${n.cost}"></div>
+      <div><input class="a-fees" type="number" step="0.01" min="0" value="${n.fees}"></div>
+      <div><input class="a-commission" type="number" step="0.01" value="${Number(x.commission||n.commission)}" title="可直接填写佣金"></div>
+      <div class="agent-calc ${n.profit<0?"agent-negative":""}">${money(n.profit)}</div>
+      <div><input class="a-received" type="number" step="0.01" min="0" value="${n.received}"></div>
+      <div class="agent-calc">${invMoney(n.outstanding)}</div>
+      <div><input class="a-source" value="${String(x.source||"").replace(/"/g,"&quot;")}" placeholder="来源 / 介绍人"></div>
+      <div><select class="a-status"><option ${x.status!=="已完成"?"selected":""}>进行中</option><option ${x.status==="已完成"?"selected":""}>已完成</option></select></div>
+      <div class="agent-actions"><button class="agent-save">保存</button><button class="agent-delete">删除</button></div>`;
+    row.querySelector(".agent-save").onclick=async()=>{
+      x.date=row.querySelector(".a-date").value;x.client=row.querySelector(".a-client").value.trim();x.project=row.querySelector(".a-project").value.trim();
+      x.sales=Number(row.querySelector(".a-sales").value||0);x.cost=Number(row.querySelector(".a-cost").value||0);x.fees=Number(row.querySelector(".a-fees").value||0);
+      x.commission=Number(row.querySelector(".a-commission").value||0);x.commissionMode="manual";x.received=Number(row.querySelector(".a-received").value||0);
+      x.source=row.querySelector(".a-source").value.trim();x.status=row.querySelector(".a-status").value;
+      await saveAgent();renderAgent();
+    };
+    row.querySelector(".agent-delete").onclick=async()=>{if(confirm("确定删除这笔中介订单？")){agentState.items.splice(i,1);await saveAgent();renderAgent();}};
+    list.appendChild(row);
+  });agentSummary();applyAgentFilter();
+}
+function applyAgentFilter(){
+  const q=(document.getElementById("agentSearch")?.value||"").toLowerCase(),f=document.getElementById("agentFilter")?.value||"all";
+  document.querySelectorAll("#agentList .agent-row").forEach(r=>{
+    const text=((r.querySelector(".a-client")?.value||"")+" "+(r.querySelector(".a-project")?.value||"")+" "+(r.querySelector(".a-source")?.value||"")).toLowerCase();
+    const ok=f==="all"||(f==="done"&&r.dataset.done==="1")||(f==="open"&&r.dataset.done!=="1")||(f==="unpaid"&&r.dataset.unpaid==="1");
+    r.style.display=(!q||text.includes(q))&&ok?"":"none";
+  });
+}
+document.addEventListener("input",e=>{if(e.target?.id==="agentSearch")applyAgentFilter();});
+document.addEventListener("change",e=>{if(e.target?.id==="agentFilter")applyAgentFilter();});
+document.addEventListener("click",async e=>{
+  if(e.target?.id==="agentBtn"){
+    ["projectPage","historyPage","investmentPage","receivablePage","wealthPage"].forEach(id=>{const x=document.getElementById(id);if(x)x.style.display="none";});
+    document.getElementById("agentPage").style.display="";await loadAgent();
+  }
+  if(e.target?.id==="agentBackBtn"){document.getElementById("agentPage").style.display="none";const p=document.getElementById("projectPage");if(p)p.style.display="";}
+  if(e.target?.id==="addAgentBtn"){
+    agentState.items.push({date:new Date().toISOString().slice(0,10),client:"",project:"",sales:0,cost:0,fees:0,commission:0,commissionMode:"manual",received:0,source:"",status:"进行中"});
+    await saveAgent();renderAgent();
+  }
+});
+</script>
+<script>
+function fxCalcLegacy(){
+ const amount=Number(document.getElementById("fxAmount")?.value||0),rate=Number(document.getElementById("fxRate")?.value||0);
+ const from=document.getElementById("fxFrom")?.value||"MYR",to=document.getElementById("fxTo")?.value||"SGD";
+ document.getElementById("fxFromLabel").textContent=from;document.getElementById("fxToLabel").textContent=to;
+ document.getElementById("fxResult").textContent=`${to} ${(amount*rate).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+ document.getElementById("fxFormula").textContent=rate>0?`${amount.toLocaleString()} ${from} × ${rate} = ${(amount*rate).toLocaleString(undefined,{maximumFractionDigits:2})} ${to}`:"输入汇率后自动计算";
+}
+document.addEventListener("input",e=>{if(["fxAmount","fxRate"].includes(e.target?.id))fxCalcLegacy();});
+document.addEventListener("change",e=>{if(["fxFrom","fxTo"].includes(e.target?.id)){document.getElementById("fxRate").value="";fxCalcLegacy();}});
+document.addEventListener("click",e=>{
+ if(e.target?.id==="fxBtn"){
+   ["projectPage","historyPage","investmentPage","receivablePage","wealthPage","agentPage"].forEach(id=>{const x=document.getElementById(id);if(x)x.style.display="none";});
+   document.getElementById("fxPage").style.display="";fxCalcLegacy();
+ }
+ if(e.target?.id==="fxBackBtn"){document.getElementById("fxPage").style.display="none";const p=document.getElementById("projectPage");if(p)p.style.display="";}
+ if(e.target?.id==="fxSwap"){
+   const f=document.getElementById("fxFrom"),t=document.getElementById("fxTo"),r=document.getElementById("fxRate");const old=f.value;f.value=t.value;t.value=old;
+   const rv=Number(r.value||0);r.value=rv>0?(1/rv).toFixed(6):"";fxCalcLegacy();
+ }
+ if(e.target?.classList?.contains("fx-quick")){
+   document.getElementById("fxFrom").value=e.target.dataset.from;document.getElementById("fxTo").value=e.target.dataset.to;document.getElementById("fxRate").value="";fxCalcLegacy();
+ }
+});
+</script>
+<script>
+function sidebarClose(){
+  document.getElementById("appSidebar")?.classList.remove("open");
+  document.getElementById("sidebarOverlay")?.classList.remove("open");
+}
+function sidebarOpen(){
+  document.getElementById("appSidebar")?.classList.add("open");
+  document.getElementById("sidebarOverlay")?.classList.add("open");
+}
+async function sidebarShowPage(page){
+  ["projectPage","historyPage","investmentPage","receivablePage","wealthPage","agentPage","fxPage","businessPage"].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display=id===page?"":"none";
+  });
+  document.querySelectorAll(".sidebar-nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  sidebarClose();
+  if(page==="investmentPage" && typeof loadInvestments==="function") await loadInvestments();
+  if(page==="receivablePage" && typeof loadReceivables==="function") await loadReceivables();
+  if(page==="wealthPage" && typeof loadWealth==="function") await loadWealth();
+  if(page==="agentPage" && typeof loadAgent==="function") await loadAgent();
+  if(page==="fxPage" && typeof fxCalc==="function") fxCalcLegacy();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.addEventListener("click",e=>{
+  if(e.target?.id==="menuToggle") sidebarOpen();
+  if(e.target?.id==="menuClose" || e.target?.id==="sidebarOverlay") sidebarClose();
+  const b=e.target?.closest?.(".sidebar-nav button[data-page]");
+  if(b) sidebarShowPage(b.dataset.page);
+});
+</script>
+<script>
+let businessState={records:[]};
+async function loadBusiness(){
+ try{
+  const ur=await supabase.auth.getUser(),email=ur?.data?.user?.email;if(!email){renderBusiness();return;}
+  const {data,error}=await supabase.from("leingbox_business").select("records").eq("username",email).maybeSingle();if(error)throw error;
+  if(data)businessState.records=Array.isArray(data.records)?data.records:[];
+  else{const {error:ie}=await supabase.from("leingbox_business").insert({username:email,records:[]});if(ie)throw ie;}
+ }catch(e){console.error(e);alert("生意表资料读取失败，请先运行 Business SQL。");}
+ renderBusiness();
+}
+async function saveBusiness(){
+ try{
+  const ur=await supabase.auth.getUser(),email=ur?.data?.user?.email;if(!email)return false;
+  const {error}=await supabase.from("leingbox_business").upsert({username:email,records:businessState.records,updated_at:new Date().toISOString()},{onConflict:"username"});if(error)throw error;return true;
+ }catch(e){console.error(e);alert("生意表资料保存失败：" + (e?.message || e));return false;}
+}
+function bizNum(r){const revenue=Number(r.revenue||0),cost=Number(r.cost||0),expense=Number(r.expense||0),profit=revenue-cost-expense;return{revenue,cost,expense,profit,margin:revenue?profit/revenue*100:0};}
+function bizMonths(){
+ const sel=document.getElementById("bizMonth");if(!sel)return;
+ const current=sel.value||new Date().toISOString().slice(0,7),months=[...new Set(businessState.records.map(r=>(r.date||"").slice(0,7)).filter(Boolean))].sort().reverse();
+ if(!months.includes(current))months.unshift(current);sel.innerHTML=months.map(m=>`<option value="${m}">${m}</option>`).join("");sel.value=current;
+}
+function renderBusiness(){
+ bizMonths();const list=document.getElementById("businessList");if(!list)return;list.innerHTML="";
+ const q=(document.getElementById("bizSearch")?.value||"").toLowerCase(),month=document.getElementById("bizMonth")?.value||"";
+ businessState.records.filter(r=>(!month||(r.date||"").startsWith(month))&&(!q||(r.name||"").toLowerCase().includes(q))).sort((a,b)=>(b.date||"").localeCompare(a.date||"")).forEach(r=>{
+  const n=bizNum(r),row=document.createElement("div");row.className="business-row business-grid";
+  const money=v=>(v<0?"-":"")+invMoney(Math.abs(v));
+  row.innerHTML=`<div>${r.date||""}</div><div>${r.name||""}</div><div>${invMoney(n.revenue)}</div><div>${invMoney(n.cost)}</div><div>${invMoney(n.expense)}</div><div class="biz-net ${n.profit<0?"biz-negative":""}">${money(n.profit)}</div><div>${n.margin.toFixed(1)}%</div><div><button class="biz-delete">删除</button></div>`;
+  row.querySelector(".biz-delete").onclick=async()=>{if(confirm("确定删除这笔生意记录？")){businessState.records.splice(businessState.records.indexOf(r),1);await saveBusiness();renderBusiness();}};
+  list.appendChild(row);
+ });businessSummary();
+}
+function businessSummary(){
+ const month=document.getElementById("bizMonth")?.value||new Date().toISOString().slice(0,7),year=month.slice(0,4);let rev=0,cost=0,exp=0,yp=0;
+ businessState.records.forEach(r=>{const n=bizNum(r);if((r.date||"").startsWith(month)){rev+=n.revenue;cost+=n.cost;exp+=n.expense}if((r.date||"").startsWith(year))yp+=n.profit;});
+ const p=rev-cost-exp;document.getElementById("bizRevenue").textContent=invMoney(rev);document.getElementById("bizCost").textContent=invMoney(cost);document.getElementById("bizExpense").textContent=invMoney(exp);document.getElementById("bizProfit").textContent=(p<0?"-":"")+invMoney(Math.abs(p));document.getElementById("bizMargin").textContent=(rev?p/rev*100:0).toFixed(1)+"%";document.getElementById("bizYearProfit").textContent=(yp<0?"-":"")+invMoney(Math.abs(yp));
+}
+document.addEventListener("input",e=>{if(e.target?.id==="bizSearch")renderBusiness();});
+document.addEventListener("change",e=>{if(e.target?.id==="bizMonth")renderBusiness();});
+document.addEventListener("click",async e=>{
+ if(e.target?.id==="businessBackBtn"){document.getElementById("businessPage").style.display="none";const p=document.getElementById("projectPage");if(p)p.style.display="";}
+ if(e.target?.id==="addBusinessBtn"){
+  const date=document.getElementById("bizDate").value,name=document.getElementById("bizName").value.trim(),revenue=Number(document.getElementById("bizRevenueInput").value||0),cost=Number(document.getElementById("bizCostInput").value||0),expense=Number(document.getElementById("bizExpenseInput").value||0);
+  if(!date){alert("请选择日期。");return;} businessState.records.push({date,name,revenue,cost,expense});await saveBusiness();["bizName","bizRevenueInput","bizCostInput","bizExpenseInput"].forEach(id=>document.getElementById(id).value="");renderBusiness();
+ }
+});
+const _sidebarShowPage=sidebarShowPage;
+sidebarShowPage=async function(page){
+ await _sidebarShowPage(page);
+ if(page==="businessPage"){document.getElementById("bizDate").value=new Date().toISOString().slice(0,10);await loadBusiness();}
+};
+</script>
+<script>
+let fxState={transactions:[]};
+function fxCalc(){
+ const amount=Number(document.getElementById("fxAmount")?.value||0),rate=Number(document.getElementById("fxRate")?.value||0);
+ const from=document.getElementById("fxFrom")?.value||"MYR",to=document.getElementById("fxTo")?.value||"SGD";
+ document.getElementById("fxFromLabel").textContent=from;document.getElementById("fxToLabel").textContent=to;
+ const result=amount*rate;document.getElementById("fxResult").textContent=`${to} ${result.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+ document.getElementById("fxFormula").textContent=rate>0?`${amount.toLocaleString()} ${from} × ${rate} = ${result.toLocaleString(undefined,{maximumFractionDigits:2})} ${to}`:"输入金额和汇率后自动计算";
+}
+async function loadFxTransactions(){
+ try{
+  const ur=await supabase.auth.getUser(),email=ur?.data?.user?.email;if(!email){renderFxHistory();return;}
+  const {data,error}=await supabase.from("leingbox_fx").select("transactions").eq("username",email).maybeSingle();if(error)throw error;
+  if(data)fxState.transactions=Array.isArray(data.transactions)?data.transactions:[];
+  else{const {error:ie}=await supabase.from("leingbox_fx").insert({username:email,transactions:[]});if(ie)throw ie;}
+ }catch(e){console.error(e);alert("汇率交易记录读取失败，请先运行 FX SQL。");}
+ renderFxHistory();
+}
+async function saveFxTransactions(){
+ try{
+  const ur=await supabase.auth.getUser(),email=ur?.data?.user?.email;if(!email)return false;
+  const {error}=await supabase.from("leingbox_fx").upsert({username:email,transactions:fxState.transactions,updated_at:new Date().toISOString()},{onConflict:"username"});if(error)throw error;return true;
+ }catch(e){console.error(e);alert("汇率交易记录保存失败：" + (e?.message || e));return false;}
+}
+function fxMonths(){
+ const sel=document.getElementById("fxHistoryMonth");if(!sel)return;
+ const cur=sel.value||new Date().toISOString().slice(0,7),months=[...new Set(fxState.transactions.map(x=>(x.date||"").slice(0,7)).filter(Boolean))].sort().reverse();
+ if(!months.includes(cur))months.unshift(cur);sel.innerHTML=months.map(m=>`<option value="${m}">${m}</option>`).join("");sel.value=cur;
+}
+function renderFxHistory(){
+ fxMonths();const list=document.getElementById("fxHistoryList");if(!list)return;list.innerHTML="";
+ const month=document.getElementById("fxHistoryMonth")?.value||"",q=(document.getElementById("fxSearch")?.value||"").toLowerCase();
+ const rows=fxState.transactions.filter(x=>(!month||(x.date||"").startsWith(month))&&(!q||(x.customer||"").toLowerCase().includes(q))).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+ rows.forEach(x=>{
+  const out=Number(x.amount||0)*Number(x.rate||0),row=document.createElement("div");row.className="fx-history-row fx-history-grid";
+  row.innerHTML=`<div>${x.date||""}</div><div><b>${x.customer||"-"}</b></div><div>${x.from} ${Number(x.amount||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</div><div>${x.to}</div><div>${Number(x.rate||0).toFixed(6)}</div><div><b>${x.to} ${out.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</b></div><div><button>删除</button></div>`;
+  row.querySelector("button").onclick=async()=>{if(confirm("确定删除这笔换汇交易？")){fxState.transactions.splice(fxState.transactions.indexOf(x),1);await saveFxTransactions();renderFxHistory();}};
+  list.appendChild(row);
+ });fxSummary(month);
+}
+function fxSummary(month){
+ const rows=fxState.transactions.filter(x=>(x.date||"").startsWith(month));const people=new Set(rows.map(x=>(x.customer||"").trim().toLowerCase()).filter(Boolean));
+ document.getElementById("fxMonthCount").textContent=rows.length;document.getElementById("fxMonthCustomers").textContent=people.size;
+ const from={};const to={};rows.forEach(x=>{from[x.from]=(from[x.from]||0)+Number(x.amount||0);to[x.to]=(to[x.to]||0)+Number(x.amount||0)*Number(x.rate||0);});
+ const fmt=o=>Object.entries(o).map(([c,v])=>`${c} ${v.toLocaleString(undefined,{maximumFractionDigits:2})}`).join(" · ")||"—";
+ document.getElementById("fxMonthFrom").textContent=fmt(from);document.getElementById("fxMonthTo").textContent=fmt(to);
+}
+document.addEventListener("input",e=>{if(["fxAmount","fxRate"].includes(e.target?.id))fxCalc();if(e.target?.id==="fxSearch")renderFxHistory();});
+document.addEventListener("change",e=>{if(e.target?.id==="fxHistoryMonth")renderFxHistory();if(["fxFrom","fxTo"].includes(e.target?.id))fxCalc();});
+document.addEventListener("click",async e=>{
+ if(e.target?.id==="saveFxTransaction"){
+  const date=document.getElementById("fxDate").value,customer=document.getElementById("fxCustomer").value.trim(),amount=Number(document.getElementById("fxAmount").value||0),rate=Number(document.getElementById("fxRate").value||0),from=document.getElementById("fxFrom").value,to=document.getElementById("fxTo").value;
+  if(!date||!customer||amount<=0||rate<=0){alert("请填写日期、顾客、金额和交易汇率。");return;}
+  fxState.transactions.push({date,customer,amount,rate,from,to});await saveFxTransactions();document.getElementById("fxCustomer").value="";document.getElementById("fxAmount").value="";document.getElementById("fxRate").value="";fxCalc();renderFxHistory();
+ }
+});
+const _sidebarShowPageFx=sidebarShowPage;
+sidebarShowPage=async function(page){
+ await _sidebarShowPageFx(page);
+ if(page==="fxPage"){document.getElementById("fxDate").value=new Date().toISOString().slice(0,10);await loadFxTransactions();fxCalc();}
+};
+</script>
+<script>
+/* robust sidebar router */
+async function openLeingboxPage(page){
+  const pages=["projectPage","historyPage","investmentPage","receivablePage","wealthPage","agentPage","fxPage","businessPage"];
+  pages.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=(id===page?"":"none");});
+  document.querySelectorAll(".sidebar-nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+  sidebarClose();
+  try{
+    if(page==="investmentPage" && typeof loadInvestments==="function") await loadInvestments();
+    if(page==="receivablePage" && typeof loadReceivables==="function") await loadReceivables();
+    if(page==="wealthPage" && typeof loadWealth==="function"){
+      const d=document.getElementById("wealthDate");if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
+      await loadWealth();
+    }
+    if(page==="agentPage" && typeof loadAgent==="function") await loadAgent();
+    if(page==="businessPage" && typeof loadBusiness==="function"){
+      const d=document.getElementById("bizDate");if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
+      await loadBusiness();
+    }
+    if(page==="fxPage" && typeof loadFxTransactions==="function"){
+      const d=document.getElementById("fxDate");if(d&&!d.value)d.value=new Date().toISOString().slice(0,10);
+      await loadFxTransactions();if(typeof fxCalc==="function")fxCalc();
+    }
+  }catch(err){console.error("Page load error:",page,err);}
+  window.scrollTo(0,0);
+}
+document.addEventListener("click",function(e){
+  const b=e.target.closest?.(".sidebar-nav button[data-page]");
+  if(b){e.preventDefault();e.stopImmediatePropagation();openLeingboxPage(b.dataset.page);}
+},true);
+</script>
+<script>
+function syncAuthMenu(session){
+  const loggedIn=!!session?.user;
+  document.body.classList.toggle("authenticated",loggedIn);
+  if(!loggedIn && typeof sidebarClose==="function") sidebarClose();
+}
+(async function initAuthMenu(){
+  try{
+    const {data}=await client.auth.getSession();
+    syncAuthMenu(data?.session);
+  }catch(e){syncAuthMenu(null);}
+})();
+client.auth.onAuthStateChange((_event,session)=>syncAuthMenu(session));
+</script>
+</body>
+</html>
