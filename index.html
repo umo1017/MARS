@@ -1196,15 +1196,7 @@ body{
 .menu-toggle{
   left:max(12px, env(safe-area-inset-left))!important;
 }
-.app-sidebar{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;padding-bottom:calc(28px + env(safe-area-inset-bottom))!important}.sidebar-nav{padding-bottom:30px!important}.db-inline-note{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:2000;display:none;max-width:88vw;padding:10px 14px;border:1px solid #eadfce;border-radius:11px;background:#fff9ef;color:#775b34;font-size:10px}.db-inline-note.show{display:block}
-/* Repayment records */
-.repay-btn{background:#eef2f5;color:#263238;border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}
-.repay-panel{grid-column:1/-1;background:#f8fafb;border:1px solid #e4e8eb;border-radius:14px;padding:12px;margin-top:4px}
-.repay-form{display:grid;grid-template-columns:150px 150px 1fr auto;gap:8px;align-items:end}
-.repay-form label{font-size:11px;color:#777;display:block;margin-bottom:4px}.repay-form input{width:100%}
-.repay-list{margin-top:10px;display:grid;gap:6px}.repay-item{display:grid;grid-template-columns:120px 120px 1fr auto;gap:8px;align-items:center;background:#fff;border:1px solid #e9ecef;border-radius:10px;padding:8px 10px;font-size:13px}.repay-del{border:0;background:#f2f2f2;border-radius:8px;padding:7px 9px;cursor:pointer}.repay-empty{color:#999;font-size:12px;padding:8px 0}.project-deduct[readonly]{background:#f4f5f6;color:#333;font-weight:700}
-@media(max-width:760px){.repay-form,.repay-item{grid-template-columns:1fr 1fr}.repay-note,.repay-item-note{grid-column:1/-1}}
-</style>
+.app-sidebar{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;padding-bottom:calc(28px + env(safe-area-inset-bottom))!important}.sidebar-nav{padding-bottom:30px!important}.db-inline-note{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:2000;display:none;max-width:88vw;padding:10px 14px;border:1px solid #eadfce;border-radius:11px;background:#fff9ef;color:#775b34;font-size:10px}.db-inline-note.show{display:block}</style>
 </head>
 <body><div id="dbInlineNote" class="db-inline-note"></div>
 
@@ -1531,6 +1523,14 @@ body{
     </main>
   </section>
 
+
+<style>
+.repay-btn{border:0;border-radius:10px;padding:10px 13px;background:#111;color:#fff;font-weight:700;cursor:pointer;white-space:nowrap}
+.repay-history-btn{border:1px solid #d7d7d7;border-radius:10px;padding:9px 11px;background:#fff;color:#333;cursor:pointer;white-space:nowrap}
+.repay-panel{grid-column:1/-1;background:#fafafa;border:1px solid #e8e8e8;border-radius:12px;padding:12px;margin-top:6px;display:none}
+.repay-panel.open{display:block}.repay-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.repay-form input{min-width:130px;flex:1;padding:10px;border:1px solid #ddd;border-radius:9px}.repay-list{margin-top:10px;display:grid;gap:7px}.repay-item{display:grid;grid-template-columns:100px 110px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #e8e8e8;font-size:13px}.repay-del{border:0;background:transparent;color:#b42318;font-size:18px;cursor:pointer}.repay-empty{font-size:13px;color:#888;margin-top:8px}@media(max-width:700px){.repay-item{grid-template-columns:85px 95px 1fr auto}.repay-panel{padding:10px}}
+</style>
+
   <template id="projectTemplate">
   <div class="project-row">
     <div class="project-cell">
@@ -1559,17 +1559,17 @@ body{
     </div>
     <button class="submit-project-btn" type="button" style="display:none">提交</button>
     <button class="repay-btn" type="button">＋还款</button>
+    <button class="repay-history-btn" type="button">还款记录</button>
     <button class="finish-btn" type="button">完成</button>
-    <button class="delete-btn" type="button" aria-label="删除" style="display:none">×</button>
-    <div class="repay-panel" style="display:none">
+    <div class="repay-panel">
       <div class="repay-form">
-        <div><label>还款日期</label><input class="repay-date" type="date"></div>
-        <div><label>还款金额</label><input class="repay-amount" type="number" min="0" step="0.01" placeholder="0.00"></div>
-        <div class="repay-note"><label>备注</label><input class="repay-note-input" type="text" placeholder="可选"></div>
-        <button class="repay-submit btn primary" type="button">提交还款</button>
+        <input class="repay-amount" type="number" min="0.01" step="0.01" placeholder="还款金额 RM">
+        <input class="repay-note" type="text" placeholder="备注（可选）">
+        <button class="btn primary repay-confirm" type="button">确认还款</button>
       </div>
       <div class="repay-list"></div>
     </div>
+    <button class="delete-btn" type="button" aria-label="删除" style="display:none">×</button>
   </div>
 </template>
 
@@ -1870,44 +1870,37 @@ function updateProjectSummary(){
   if($("summaryOverdue")) $("summaryOverdue").textContent=overdue;
 }
 
-function ensureRepayments(project){
-  if(!Array.isArray(project.repayments)) project.repayments=[];
-  if(project.base_deduct === undefined || project.base_deduct === null){
-    project.base_deduct = Number(project.deduct || 0);
+async function ensureProjectKey(project){
+  if(!project.repayment_key){
+    project.repayment_key = (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+    await saveNow();
   }
-  project.deduct = Number(project.base_deduct||0) + project.repayments.reduce((sum,r)=>sum+Number(r.amount||0),0);
-  return project.deduct;
+  return project.repayment_key;
 }
 
-function renderRepayments(project,row,refresh){
-  ensureRepayments(project);
-  const panel=row.querySelector('.repay-panel'), list=row.querySelector('.repay-list');
-  const date=row.querySelector('.repay-date'), amount=row.querySelector('.repay-amount'), note=row.querySelector('.repay-note-input');
-  date.value=todayString();
-  const paint=()=>{
-    list.innerHTML='';
-    if(!project.repayments.length){ list.innerHTML='<div class="repay-empty">还没有还款记录</div>'; return; }
-    [...project.repayments].reverse().forEach((r,revIndex)=>{
-      const realIndex=project.repayments.length-1-revIndex;
-      const item=document.createElement('div'); item.className='repay-item';
-      const safeNote=String(r.note||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-      item.innerHTML=`<div>${r.date||''}</div><strong>${formatRM(r.amount)}</strong><div class="repay-item-note">${safeNote||'-'}</div><button class="repay-del" type="button">删除</button>`;
-      item.querySelector('.repay-del').onclick=async()=>{
-        if(!confirm('确定删除这笔还款记录吗？')) return;
-        project.repayments.splice(realIndex,1); ensureRepayments(project);
-        try{await saveNow(); refresh();}catch(e){console.error(e);alert('删除保存失败，请检查网络。')}
-      };
-      list.appendChild(item);
-    });
-  };
-  row.querySelector('.repay-btn').onclick=()=>{panel.style.display=panel.style.display==='none'?'block':'none';paint()};
-  row.querySelector('.repay-submit').onclick=async()=>{
-    const v=Number(amount.value||0); if(v<=0){alert('请输入还款金额');return;}
-    project.repayments.push({date:date.value||todayString(),amount:v,note:note.value.trim(),created_at:new Date().toISOString()});
-    ensureRepayments(project);
-    try{await saveNow(); amount.value='';note.value='';refresh();}catch(e){project.repayments.pop();ensureRepayments(project);console.error(e);alert('还款保存失败，请检查网络。')}
-  };
-  paint();
+async function loadRepayments(project){
+  const key=await ensureProjectKey(project);
+  const email=state.user.email.toLowerCase();
+  const {data,error}=await client.from("leingbox_repayments").select("id,repayment_date,amount,note,created_at").eq("username",email).eq("project_key",key).order("created_at",{ascending:false});
+  if(error) throw error;
+  return data||[];
+}
+
+async function addRepayment(project,amount,note){
+  const key=await ensureProjectKey(project);
+  const email=state.user.email.toLowerCase();
+  const {error}=await client.from("leingbox_repayments").insert({username:email,project_key:key,repayment_date:todayString(),amount:Number(amount),note:(note||"").trim()});
+  if(error) throw error;
+  project.deduct=Number(project.deduct||0)+Number(amount);
+  await saveNow();
+}
+
+async function deleteRepayment(project,record){
+  const email=state.user.email.toLowerCase();
+  const {error}=await client.from("leingbox_repayments").delete().eq("id",record.id).eq("username",email);
+  if(error) throw error;
+  project.deduct=Math.max(0,Number(project.deduct||0)-Number(record.amount||0));
+  await saveNow();
 }
 
 function render(){
@@ -1929,9 +1922,14 @@ function render(){
     const remain = row.querySelector(".remain");
     const finish = row.querySelector(".finish-btn");
     const del = row.querySelector(".delete-btn");
+    const repayBtn = row.querySelector(".repay-btn");
+    const repayHistoryBtn = row.querySelector(".repay-history-btn");
+    const repayPanel = row.querySelector(".repay-panel");
+    const repayAmount = row.querySelector(".repay-amount");
+    const repayNote = row.querySelector(".repay-note");
+    const repayConfirm = row.querySelector(".repay-confirm");
+    const repayList = row.querySelector(".repay-list");
 
-    ensureRepayments(project);
-    deduct.readOnly = true;
     name.value = project.name || "";
     if(!project.project_date) project.project_date = todayString();
     createdDate.value = project.project_date;
@@ -1950,8 +1948,7 @@ function render(){
 
     const updateRemain = async ()=>{
       const priceValue = Number(price.value || 0);
-      const deductValue = ensureRepayments(project);
-      deduct.value = deductValue;
+      const deductValue = Number(deduct.value || 0);
       const remaining = priceValue - deductValue;
       remain.textContent = formatRM(remaining);
       remain.classList.toggle("negative", remaining < 0);
@@ -1982,7 +1979,7 @@ function render(){
       project.name = name.value;
       project.project_date = createdDate.value || todayString();
       project.price = Number(price.value || 0);
-      project.deduct = ensureRepayments(project);
+      project.deduct = Number(deduct.value || 0);
       project.due_date = dueDate.value || null;
       try{ await saveNow(); }
       catch(err){ console.error(err); alert("保存失败，请检查网络后再试。"); }
@@ -1993,16 +1990,58 @@ function render(){
       updateRemain();
       updateProjectSummary();
     });
+    deduct.addEventListener("input", ()=>{
+      project.deduct = Number(deduct.value || 0);
+      updateRemain();
+      updateProjectSummary();
+    });
     name.addEventListener("change", saveRow);
     price.addEventListener("change", saveRow);
+    deduct.addEventListener("change", saveRow);
     createdDate.addEventListener("change", saveRow);
     dueDate.addEventListener("change", saveRow);
+
+    const showRepaymentHistory = async ()=>{
+      repayPanel.classList.add("open");
+      repayList.innerHTML='<div class="repay-empty">正在读取...</div>';
+      try{
+        const records=await loadRepayments(project);
+        repayList.innerHTML="";
+        if(!records.length){ repayList.innerHTML='<div class="repay-empty">还没有还款记录</div>'; return; }
+        records.forEach(rec=>{
+          const item=document.createElement("div"); item.className="repay-item";
+          const date=(rec.repayment_date||"").split("-").reverse().join("/");
+          item.innerHTML=`<span>${date}</span><strong>${formatRM(rec.amount)}</strong><span>${rec.note||"—"}</span><button class="repay-del" type="button" title="删除">×</button>`;
+          item.querySelector(".repay-del").addEventListener("click",async()=>{
+            if(!confirm(`确定删除这笔 ${formatRM(rec.amount)} 还款吗？`)) return;
+            try{ await deleteRepayment(project,rec); render(); }
+            catch(e){ console.error(e); alert("删除失败，请检查网络。") }
+          });
+          repayList.appendChild(item);
+        });
+      }catch(e){ console.error(e); repayList.innerHTML='<div class="repay-empty">读取失败，请确认已运行还款记录 SQL。</div>'; }
+    };
+    repayBtn.addEventListener("click",()=>{ repayPanel.classList.toggle("open"); if(repayPanel.classList.contains("open")) repayAmount.focus(); });
+    repayHistoryBtn.addEventListener("click",showRepaymentHistory);
+    repayConfirm.addEventListener("click",async()=>{
+      const amount=Number(repayAmount.value||0);
+      if(!(amount>0)){ alert("请输入还款金额。"); return; }
+      const remaining=Number(project.price||0)-Number(project.deduct||0);
+      if(remaining>0 && amount>remaining && !confirm(`还款金额 ${formatRM(amount)} 超过剩余 ${formatRM(remaining)}，确定继续吗？`)) return;
+      repayConfirm.disabled=true;
+      try{
+        await addRepayment(project,amount,repayNote.value);
+        repayAmount.value=""; repayNote.value="";
+        render();
+      }catch(e){ console.error(e); alert("还款保存失败，请确认已运行还款记录 SQL，并检查网络。") }
+      finally{ repayConfirm.disabled=false; }
+    });
 
     finish.addEventListener("click", async ()=>{
       project.name = name.value;
       project.project_date = createdDate.value || todayString();
       project.price = Number(price.value || 0);
-      project.deduct = ensureRepayments(project);
+      project.deduct = Number(deduct.value || 0);
       project.due_date = dueDate.value || null;
       project.completed = true;
       project.completed_at = project.project_date || todayString();
@@ -2029,7 +2068,6 @@ function render(){
     });
 
     updateRemain();
-    renderRepayments(project,row,render);
     list.appendChild(row);
   });
 
