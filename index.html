@@ -1053,7 +1053,12 @@ body{
 .receivable-summary span{display:block;font-size:10px;color:#777;margin-bottom:6px}
 .receivable-summary strong{font-size:16px}
 .rec-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:17px;background:#fff}
-.rec-grid{display:grid;grid-template-columns:105px 115px 140px 155px 115px 115px 115px 95px 130px;min-width:1090px;align-items:center}
+.rec-grid{display:grid;grid-template-columns:115px 140px 155px 115px 115px 115px 95px 170px 130px;min-width:1150px;align-items:center}
+.rec-pay-btn,.rec-history-btn{border:0;border-radius:8px;padding:8px 10px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}
+.rec-pay-btn{background:#111;color:#fff}.rec-history-btn{background:#f1f1f1;color:#222}
+.rec-history-panel{grid-column:1/-1;padding:10px 14px 14px;background:#fafafa;border-top:1px solid var(--line);font-size:12px}
+.rec-history-line{display:grid;grid-template-columns:110px 110px 1fr 65px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #eee}
+.rec-history-line:last-child{border-bottom:0}.rec-history-line button{border:0;background:#eee;border-radius:7px;padding:6px;font-size:10px}
 .rec-head{padding:11px 10px;background:#f6f4f0;font-size:10px;color:#777;font-weight:750}
 .rec-row{padding:9px 10px;border-top:1px solid var(--line)}
 .rec-row input,.rec-row select{width:calc(100% - 8px);box-sizing:border-box;min-height:36px;padding:5px 7px;border:1px solid #e7e3dd;border-radius:9px;background:#faf9f7;font-size:10px}
@@ -1065,7 +1070,7 @@ body{
 @media(max-width:600px){
  .receivable-summary{grid-template-columns:repeat(2,1fr)}
  .receivable-summary>div:last-child{grid-column:span 2}
- .rec-grid{grid-template-columns:96px 105px 125px 135px 105px 105px 105px 85px 115px;min-width:976px}
+ .rec-grid{grid-template-columns:105px 125px 135px 105px 105px 105px 85px 155px 115px;min-width:1035px}
 }
 
 .wealth-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:18px 0}
@@ -1466,8 +1471,8 @@ body{
 
   <div class="rec-table-wrap">
     <div class="rec-grid rec-head">
-      <div>日期</div><div>截止日期</div><div>欠款人</div><div>项目</div>
-      <div>欠款总额</div><div>已收回</div><div>未收回</div><div>状态</div><div>操作</div>
+      <div>截止日期</div><div>欠款人</div><div>项目</div>
+      <div>欠款总额</div><div>已收回</div><div>未收回</div><div>状态</div><div>收款</div><div>操作</div>
     </div>
     <div id="receivableList"></div>
   </div>
@@ -2408,29 +2413,69 @@ function recSummary(){
   document.getElementById("recPeople").textContent=people.size;
   document.getElementById("recOverdue").textContent=invMoney(overdue);
 }
+function recEsc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+function recToday(){return new Date().toLocaleDateString("en-CA");}
+async function addReceivableIncome(amount,person,project,date){
+  if(typeof loadWealth!=="function"||typeof saveWealth!=="function")return false;
+  await loadWealth();
+  wealthState.records.push({date,income:Number(amount||0),expense:0,source:"别人还款",note:[person,project].filter(Boolean).join(" · "),settings:{...wealthState.settings}});
+  return await saveWealth();
+}
 function renderReceivables(){
   const list=document.getElementById("receivableList");if(!list)return;list.innerHTML="";
   const today=new Date();today.setHours(0,0,0,0);
   receivableState.items.forEach((x,i)=>{
+    if(!Array.isArray(x.repayments))x.repayments=[];
     const rem=Math.max(0,Number(x.total||0)-Number(x.received||0));
     const overdue=rem>0&&x.due&&new Date(x.due+"T00:00:00")<today;
     const row=document.createElement("div");row.className="rec-row rec-grid"+(overdue?" rec-overdue":"");
     row.dataset.overdue=overdue?"1":"0";row.dataset.done=rem<=0?"1":"0";
     row.innerHTML=`
-      <div><input class="r-date" type="date" value="${x.date||""}"></div>
       <div><input class="r-due" type="date" value="${x.due||""}"></div>
-      <div><input class="r-person" value="${String(x.person||"").replace(/"/g,"&quot;")}" placeholder="名字"></div>
-      <div><input class="r-project" value="${String(x.project||"").replace(/"/g,"&quot;")}" placeholder="项目"></div>
+      <div><input class="r-person" value="${recEsc(x.person)}" placeholder="名字"></div>
+      <div><input class="r-project" value="${recEsc(x.project)}" placeholder="项目"></div>
       <div><input class="r-total" type="number" step="0.01" min="0" value="${Number(x.total||0)}"></div>
-      <div><input class="r-received" type="number" step="0.01" min="0" value="${Number(x.received||0)}"></div>
+      <div class="rec-calc">${invMoney(Number(x.received||0))}</div>
       <div class="rec-calc">${invMoney(rem)}</div>
       <div class="rec-calc">${rem<=0?"已结清":overdue?"已逾期":"未结清"}</div>
+      <div class="rec-actions"><button class="rec-pay-btn">＋还款</button><button class="rec-history-btn">还款记录</button></div>
       <div class="rec-actions"><button class="rec-save">保存</button><button class="rec-delete">删除</button></div>`;
     row.querySelector(".rec-save").onclick=async()=>{
-      x.date=row.querySelector(".r-date").value;x.due=row.querySelector(".r-due").value;
+      x.due=row.querySelector(".r-due").value;
       x.person=row.querySelector(".r-person").value.trim();x.project=row.querySelector(".r-project").value.trim();
-      x.total=Number(row.querySelector(".r-total").value||0);x.received=Number(row.querySelector(".r-received").value||0);
-      await saveReceivables();renderReceivables();
+      x.total=Number(row.querySelector(".r-total").value||0);
+      if(await saveReceivables()){renderReceivables();}
+    };
+    row.querySelector(".rec-pay-btn").onclick=async()=>{
+      if(!x.person){alert("请先填写欠款人并保存。");return;}
+      const raw=prompt("输入这次收到的还款金额（RM）");if(raw===null)return;
+      const amount=Number(raw);if(!Number.isFinite(amount)||amount<=0){alert("请输入正确的还款金额。");return;}
+      const currentRem=Math.max(0,Number(x.total||0)-Number(x.received||0));
+      if(amount>currentRem){alert("还款金额不能超过未收回金额 "+invMoney(currentRem));return;}
+      const note=prompt("备注（可不填）","");if(note===null)return;
+      const date=recToday();
+      const repayment={id:(crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random()),date,amount,note:note.trim()};
+      x.repayments.push(repayment);x.received=Number(x.received||0)+amount;
+      if(!(await saveReceivables())){x.repayments.pop();x.received-=amount;return;}
+      const incomeOK=await addReceivableIncome(amount,x.person,x.project,date);
+      if(!incomeOK)showDbNote("还款已保存，但＋收益暂时无法保存，请确认 Wealth SQL 已运行。");
+      renderReceivables();
+    };
+    row.querySelector(".rec-history-btn").onclick=()=>{
+      const old=row.nextElementSibling;if(old?.classList?.contains("rec-history-panel")){old.remove();return;}
+      const panel=document.createElement("div");panel.className="rec-history-panel";
+      if(!x.repayments.length){panel.innerHTML="还没有还款记录";}
+      else{x.repayments.slice().reverse().forEach(r=>{
+        const line=document.createElement("div");line.className="rec-history-line";
+        line.innerHTML=`<div>${recEsc(r.date)}</div><strong>${invMoney(r.amount)}</strong><div>${recEsc(r.note||"")}</div><button>删除</button>`;
+        line.querySelector("button").onclick=async()=>{
+          if(!confirm("确定删除这笔还款记录？"))return;
+          const idx=x.repayments.findIndex(z=>z.id===r.id);if(idx<0)return;
+          x.repayments.splice(idx,1);x.received=Math.max(0,Number(x.received||0)-Number(r.amount||0));
+          await saveReceivables();renderReceivables();
+        };panel.appendChild(line);
+      });}
+      row.insertAdjacentElement("afterend",panel);
     };
     row.querySelector(".rec-delete").onclick=async()=>{if(confirm("确定删除这笔欠款？")){receivableState.items.splice(i,1);await saveReceivables();renderReceivables();}};
     list.appendChild(row);
@@ -2456,7 +2501,7 @@ document.addEventListener("click",async e=>{
     const p=document.getElementById("projectPage");if(p)p.style.display="";
   }
   if(e.target?.id==="addReceivableBtn"){
-    receivableState.items.push({date:new Date().toISOString().slice(0,10),due:"",person:"",project:"",total:0,received:0});
+    receivableState.items.push({due:"",person:"",project:"",total:0,received:0,repayments:[]});
     await saveReceivables();renderReceivables();
   }
 });
