@@ -2404,7 +2404,7 @@ async function saveReceivable(x,row){
     if(q.error)throw q.error;
     try{await client.rpc("leingbox_sync_receivable_interest");}catch(_e){}
     await loadReceivables(); return true;
-  }catch(e){console.error(e);showDbNote("别人欠我暂时无法保存，请确认最新 SQL 与权限设置。");return false;}
+  }catch(e){console.error("Receivable save error:",e);const msg=[e?.message,e?.details,e?.hint,e?.code?"Code: "+e.code:""] .filter(Boolean).join(" | ");showDbNote("保存失败："+(msg||String(e)));alert("别人欠我保存失败\n\n"+(msg||String(e)));return false;}
 }
 async function addReceivableIncome(amount,person,project,date){
   if(typeof loadWealth!=="function"||typeof saveWealth!=="function")return false;
