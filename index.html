@@ -1320,7 +1320,7 @@ industrial park singapore 408933</textarea></label><label>Telephone<input id="tw
    <h3 style="margin-top:23px">Monthly Summary</h3><div class="tw-scroll"><table><thead><tr><th>Items</th><th>Qty</th><th>Unit Price (SGD)</th><th>Total Price</th></tr></thead><tbody id="twMonthly"></tbody><tfoot><tr><td>Sales</td><td id="twTotalQty"></td><td></td><td id="twSales"></td></tr></tfoot></table></div>
    <div class="tw-result"><div><div class="tw-boxhead">Towel Balance</div><table class="tw-balance"><thead><tr><th>Size</th><th>Opening</th><th>Received</th><th>Balance</th></tr></thead><tbody id="twStock"></tbody></table><div class="tw-guide">Balance = Opening + Received − Monthly Qty. Negative balances are highlighted.</div></div><div><div class="tw-costs"><label>Cage (SGD)<input id="twCage" type="number" min="0" step="0.01"></label><label>Rental (SGD)<input id="twRental" type="number" min="0" step="0.01"></label><label>Delivery (SGD)<input id="twDelivery" type="number" min="0" step="0.01"></label><label>Staff (% of Total Sales)<input id="twStaffPct" type="number" min="20" max="20" step="1" value="20" readonly></label><label style="display:none">Legacy Share (%)<input id="twSharePct" type="number" min="0" max="100" step="0.01"></label><label>Other expenses (SGD)<input id="twOther" type="number" min="0" step="0.01"></label></div><table class="tw-stats"><tbody id="twFinance"></tbody></table><div class="tw-split"><div class="tw-boxhead">Profit Sharing · Names from PDF</div><div class="tw-note">Profit-sharing names and percentages match the April 2026 PDF. Amounts are calculated from the subtotal after the exact recorded expenses and 20% staff cost. Editable per month.</div><div id="twShares"></div><button type="button" id="twAddShare" class="tw-edit-only">+ Add Person</button><div id="twShareWarning" class="tw-note"></div></div></div></div>
   </div></div>
- <div class="tw-actions"><button type="button" class="tw-primary" id="twSave">Save Monthly Report</button><button type="button" id="twPdf">Download PDF File</button><button type="button" id="twCSV">Export CSV</button></div><div id="twStatus" class="tw-status" role="status"></div><div class="tw-status" style="font-size:12px">PDF direct-download version · 06 NOV 2026</div>
+ <div class="tw-actions"><button type="button" class="tw-primary" id="twSave">Save Monthly Report</button><button type="button" id="twPdf">Download PDF File</button><button type="button" id="twCSV">Export CSV</button></div><div id="twStatus" class="tw-status" role="status"></div><div class="tw-status" style="font-size:12px">Editorial luxury A4 PDF layout</div>
 </section>
 
 <section id="businessPage" class="panel business-page" style="display:none">
@@ -2961,77 +2961,83 @@ document.addEventListener('DOMContentLoaded',()=>{renderStructure();const curren
 function downloadTowelSummaryPdf(){
  const mb=(el('twMb').value||'MB').replace(/[^a-zA-Z0-9_-]/g,'_');
  const [year,month]=el('twMonth').value.split('-').map(Number);
- const monthEnglish=new Date(Date.UTC(year,month-1,1)).toLocaleString('en-US',{month:'long'}).toUpperCase();
- const filename=`${mb}-${monthEnglish} ${year}.pdf`;
- const {qty,sales,staff,sub}=calculate();
- const shares=activeShares();
- const safe=v=>String(v??'').normalize('NFKD').replace(/[^\x20-\x7e]/g,' ').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/\s+/g,' ').trim();
- const fnum=(v)=>Number(v||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
- const fmt=n=>'$'+fnum(n);
- const cmds=[];
- const rgb=(h)=>h.match(/../g).map(v=>(parseInt(v,16)/255).toFixed(3)).join(' ');
- const rect=(x,y,w,h,fill,stroke)=>{cmds.push(`${rgb(fill)} rg`);if(stroke)cmds.push(`${rgb(stroke)} RG 0.5 w`);cmds.push(`${x} ${842-y-h} ${w} ${h} re ${stroke?'B':'f'}`)};
- const line=(x1,y1,x2,y2,c='9c9c9c')=>cmds.push(`${rgb(c)} RG 0.55 w ${x1} ${842-y1} m ${x2} ${842-y2} l S`);
- const txt=(x,y,value,size=11,color='333333',font='F1')=>cmds.push(`BT /${font} ${size} Tf ${rgb(color)} rg 1 0 0 1 ${x} ${842-y} Tm (${safe(value)}) Tj ET`);
- const blue='073e78',black='202020',grid='252525';
- rect(0,0,595,842,'f8f8f8');rect(0,0,595,216,'063a74');
- // Sloping wave separating the blue masthead from the report
- cmds.push(`${rgb('063a74')} rg 0 626 m 50 653 l 145 670 l 260 653 l 375 646 l 485 653 l 595 676 l 595 842 l 0 842 l h f`);
- txt(22,57,current.companyName||'MCT BEAUTY',31,'ffffff','F2');
- const addr=String(current.companyAddress||'').split('\n').filter(Boolean);
- addr.slice(0,3).forEach((t,i)=>txt(25,86+i*18,t,11,'dce9f7'));
- txt(25,86+Math.min(addr.length,3)*18,'Tel: '+(current.companyPhone||''),11,'dce9f7');
- txt(410,49,mb+'-'+monthEnglish+' '+year,15,'e1eafa','F2');
- const shareText=shares.filter(x=>x.name&&String(x.name).toUpperCase()!=='MCT').map(x=>'('+x.name+') -'+Number(x.pct)+'%').join(' / ');
- if(shareText)txt(410,74,shareText.substring(0,28),11,'e1eafa');
- if(current.staff)txt(410,99,'Staff: '+String(current.staff).substring(0,26),11,'e1eafa');
- txt(199,258,'Summary Report',24,'111111','F2');
- const x=45,w=[190,82,105,128],columns=[x,x+w[0],x+w[0]+w[1],x+w[0]+w[1]+w[2],x+505];
- const top=291,rh=31;
- rect(x,top,505,rh,blue,grid);
- ['Items','Qty','Unit Price','Total Price'].forEach((t,i)=>txt(columns[i]+8,top+20,t,11,'ffffff','F2'));
- for(let r=0;r<5;r++){
-   let yy=top+rh*(r+1);rect(x,yy,505,rh,'f5f5f5',grid);
-   txt(columns[0]+8,yy+20,'Bamboo Towel '+SIZES[r],11,black);
-   txt(columns[1]+12,yy+20,String(qty[r]),11,black);
-   txt(columns[2]+20,yy+20,fmt(current.prices[r]),11,black);
-   txt(columns[3]+16,yy+20,fmt(qty[r]*current.prices[r]),11,black);
- }
- for(let i=1;i<4;i++)line(columns[i],top,columns[i],top+rh*6,grid);
- const below=top+rh*6+42;
- // Towel balance
- rect(45,below,218,31,blue,grid);txt(72,below+20,'Towel Balance',12,'ffffff','F2');
- SIZES.forEach((v,i)=>{const yy=below+31+i*29;rect(45,yy,218,29,'f3f3f3',grid);line(151,yy,151,yy+29,grid);txt(63,yy+19,v,11,black);txt(194,yy+19,String(num(current.opening[i])+num(current.received[i])-qty[i]),11,black)});
- // Expenses and profit summary
- const costRows=[['Sales',sales],['Cage',current.cage],['Rental',current.rental],['Delivery',current.delivery]];
- if(num(current.other)!==0)costRows.push(['Other',current.other]);
- costRows.push(['Staff (20%)',staff],['Subtotal',sub]);
- for(const sh of shares){costRows.push([`${sh.name} (${num(sh.pct)}%)`,sub*num(sh.pct)/100])}
- const cy=below, rr=Math.min(29,205/costRows.length),tx=327;
- costRows.forEach(([name,value],i)=>{const yy=cy+i*rr;const highlight=i>=costRows.findIndex(x=>x[0]==='Subtotal');rect(tx,yy,222,rr,highlight?blue:'f3f3f3',grid);line(438,yy,438,yy+rr,grid);txt(tx+8,yy+rr*0.68,String(name).slice(0,18),10,highlight?'ffffff':black,highlight?'F2':'F1');txt(449,yy+rr*0.68,fmt(value),10,highlight?'ffffff':black,highlight?'F2':'F1')});
- txt(45,802,`${mb}-${monthEnglish} ${year} | Generated from Leingbox`,8,'7a7a7a');
- // Compact standalone PDF writer, no external scripts or libraries required.
- const stream=cmds.join('\n')+'\n';
- const objects=[null,
- '<< /Type /Catalog /Pages 2 0 R >>',
- '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
- '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>',
- '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
- '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>',
- `<< /Length ${new TextEncoder().encode(stream).length} >>\nstream\n${stream}endstream`,
- `<< /Title (${safe(filename)}) /Producer (Leingbox MB Report) >>`
- ];
- let pdf='%PDF-1.4\n', offsets=[0];
- for(let i=1;i<objects.length;i++){offsets[i]=new TextEncoder().encode(pdf).length;pdf+=`${i} 0 obj\n${objects[i]}\nendobj\n`}
- const startXref=new TextEncoder().encode(pdf).length;
- pdf+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;
- for(let i=1;i<objects.length;i++)pdf+=String(offsets[i]).padStart(10,'0')+' 00000 n \n';
- pdf+=`trailer\n<< /Size ${objects.length} /Root 1 0 R /Info 7 0 R >>\nstartxref\n${startXref}\n%%EOF`;
+ const englishMonth=new Date(Date.UTC(year,month-1,1)).toLocaleString('en-US',{month:'long'}).toUpperCase();
+ const filename=`${mb}-${englishMonth} ${year}.pdf`;
+ const {qty,sales,staff,sub}=calculate(),shares=activeShares();
+ const clean=v=>String(v??'').normalize('NFKD').replace(/[^\x20-\x7e]/g,' ').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/\s+/g,' ').trim();
+ const cash=n=>(Number(n||0)<0?'-$':'$')+Math.abs(Number(n||0)).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+ const integer=n=>Number(n||0).toLocaleString('en-US',{maximumFractionDigits:0});
+ const cream='FAF8F4',white='FFFFFF',ink='252A2A',muted='787B77',copper='A47B4D',pale='F0EBE4',rule='DCD5CB',olive='4C6258',red='A8504B';
+ const commands=[],rgb=h=>h.match(/../g).map(v=>(parseInt(v,16)/255).toFixed(4)).join(' ');
+ const rect=(x,y,w,h,color)=>commands.push(`${rgb(color)} rg ${x} ${842-y-h} ${w} ${h} re f`);
+ const line=(x1,y1,x2,y2,color=rule,width=.7)=>commands.push(`${rgb(color)} RG ${width} w ${x1} ${842-y1} m ${x2} ${842-y2} l S`);
+ const text=(x,y,value,size=10,color=ink,font='F1')=>commands.push(`BT /${font} ${size} Tf ${rgb(color)} rg 1 0 0 1 ${x} ${842-y} Tm (${clean(value)}) Tj ET`);
+ const width=(value,size=10,bold=false)=>{let n=0;for(const c of String(value??''))n+=('il.,:;!| '.includes(c)?.28:'MW@%'.includes(c)?.83:'0123456789'.includes(c)?.56:.54);return n*size*(bold?1.06:1)};
+ const right=(x,y,value,size=10,color=ink,font='F1')=>text(x-width(value,size,font==='F2'),y,value,size,color,font);
+ const section=(x,y,number,name)=>{text(x,y,number,9,copper,'F2');text(x+24,y,name.toUpperCase(),10,ink,'F2')};
+ const W=595;
+ rect(0,0,W,842,cream);
+ rect(0,0,W,9,ink);
+ // Editorial masthead, no oversized color block
+ text(43,48,'MCT',11,copper,'F2');text(80,48,'/  MONTHLY ACCOUNT',9,muted,'F1');
+ right(552,48,'PRIVATE  /  FINANCIAL STATEMENT',8,muted,'F1');
+ line(43,62,552,62,ink,1.0);
+ text(43,102,current.companyName||'MCT BEAUTY',27,ink,'F3');
+ const address=String(current.companyAddress||'').split('\n').map(s=>s.trim()).filter(Boolean);
+ address.slice(0,2).forEach((s,i)=>text(44,126+i*14,s.slice(0,65),9,muted));
+ text(44,154,'TEL  '+(current.companyPhone||''),9,muted);
+ right(550,101,mb,25,copper,'F3');right(550,129,englishMonth+' '+year,11,ink,'F2');
+ right(550,153,'TOWEL OPERATIONS',8,muted);
+ line(43,178,552,178,rule,.8);
+ // Statement summary with a dramatic typographic anchor
+ text(43,214,'SUMMARY',10,copper,'F2');
+ text(43,247,'Monthly statement',23,ink,'F3');
+ right(551,216,'REPORT PERIOD',8,muted,'F2');
+ right(551,244,englishMonth+' '+year,13,ink,'F2');
+ // Stat row: understated no large dashboard cards
+ const metrics=[['GROSS SALES',cash(sales)],['STAFF COST / 20%',cash(staff)],['NET RESULT',cash(sub)]];
+ line(43,267,552,267,ink,.9);
+ metrics.forEach((m,i)=>{const x=43+i*173;text(x,287,m[0],8,muted,'F2');text(x,321,m[1],i===2?18:17,i===2?olive:ink,'F3');if(i<2)line(x+163,277,x+163,332,rule,.7)});
+ line(43,343,552,343,rule,.8);
+ // Sales breakdown
+ section(43,374,'01','Towel sales');
+ const top=389,headH=26,rowH=27;
+ rect(43,top,509,headH,ink);
+ text(55,407,'PRODUCT DESCRIPTION',8,white,'F2');
+ right(364,407,'QTY',8,white,'F2');
+ right(449,407,'RATE',8,white,'F2');
+ right(539,407,'AMOUNT',8,white,'F2');
+ SIZES.forEach((sz,i)=>{const y=top+headH+i*rowH;if(i%2===0)rect(43,y,509,rowH,white);line(43,y+rowH,552,y+rowH,rule,.5);text(55,y+18,'Bamboo Towel  /  '+sz,10,ink);right(364,y+18,integer(qty[i]),10,ink);right(449,y+18,cash(current.prices[i]),10,muted);right(539,y+18,cash(qty[i]*Number(current.prices[i]||0)),10,ink,'F2')});
+ const totalY=top+headH+5*rowH;
+ rect(43,totalY,509,29,pale);text(55,totalY+19,'TOTAL SALES',9,ink,'F2');right(539,totalY+19,cash(sales),12,ink,'F2');
+ // Two blocks with rich whitespace
+ section(43,610,'02','Inventory remaining');section(318,610,'03','Operating expenses');
+ line(43,625,284,625,ink,.6);line(318,625,552,625,ink,.6);
+ SIZES.forEach((sz,i)=>{const y=644+i*22;const bal=Number(current.opening[i]||0)+Number(current.received[i]||0)-qty[i];text(45,y,sz,9,muted);right(282,y,integer(bal),10,bal<0?red:ink,'F2');line(43,y+7,284,y+7,rule,.35)});
+ const expenses=[['Cage',Number(current.cage||0)],['Rental',Number(current.rental||0)],['Delivery',Number(current.delivery||0)],['Staff / 20%',staff]];
+ if(Number(current.other||0))expenses.splice(3,0,['Other',Number(current.other||0)]);
+ expenses.forEach(([label,value],i)=>{const y=644+i*22;text(320,y,label,9,muted);right(550,y,cash(value),10,ink);line(318,y+7,552,y+7,rule,.35)});
+ // Profit share area
+ const shareTop=769;
+ line(43,shareTop-13,552,shareTop-13,ink,.8);
+ text(43,shareTop,'04',9,copper,'F2');text(67,shareTop,'PROFIT DISTRIBUTION',10,ink,'F2');
+ let recipients=shares.filter(s=>String(s.name||'').trim());
+ recipients.slice(0,3).forEach((s,i)=>{const x=43+i*170,y=790;text(x,y,String(s.name).toUpperCase().slice(0,16)+' / '+Number(s.pct||0)+'%',8,muted,'F2');text(x,y+19,cash(sub*Number(s.pct||0)/100),12,ink,'F2')});
+ if(recipients.length>3)text(43,830,'Additional recipients: '+recipients.slice(3).map(s=>s.name+' '+s.pct+'%').join(', ').slice(0,99),7,muted);
+ else {line(43,826,552,826,rule,.6);text(43,837,'LEINGBOX  /  '+mb+'  /  '+englishMonth+' '+year,7,muted)}
+ // Single-page compact PDF, downloadable offline
+ const stream=commands.join('\n')+'\n',encoder=new TextEncoder();
+ const objs=[null,'<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R /F3 6 0 R >> >> /Contents 7 0 R >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>','<< /Type /Font /Subtype /Type1 /BaseFont /Times-Bold >>',`<< /Length ${encoder.encode(stream).length} >>\nstream\n${stream}endstream`];
+ let pdf='%PDF-1.4\n',offsets=[0];
+ for(let i=1;i<objs.length;i++){offsets[i]=encoder.encode(pdf).length;pdf+=`${i} 0 obj\n${objs[i]}\nendobj\n`}
+ const xref=encoder.encode(pdf).length;
+ pdf+=`xref\n0 ${objs.length}\n0000000000 65535 f \n`;
+ for(let i=1;i<objs.length;i++)pdf+=String(offsets[i]).padStart(10,'0')+' 00000 n \n';
+ pdf+=`trailer\n<< /Size ${objs.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
  const blob=new Blob([pdf],{type:'application/pdf'}),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
- status('PDF ready: '+filename);
+ status('Downloaded '+filename);
 }
-
  el('twSave').onclick=save;el('twPdf').onclick=downloadTowelSummaryPdf;el('twCSV').onclick=csvExport;
 });
 })();
