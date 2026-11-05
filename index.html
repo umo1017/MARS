@@ -2980,7 +2980,6 @@ function downloadTowelSummaryPdf(){
  rect(0,0,W,9,ink);
  // Editorial masthead, no oversized color block
  text(43,48,'MCT',11,copper,'F2');text(80,48,'/  MONTHLY ACCOUNT',9,muted,'F1');
- right(552,48,'PRIVATE  /  FINANCIAL STATEMENT',8,muted,'F1');
  line(43,62,552,62,ink,1.0);
  text(43,102,current.companyName||'MCT BEAUTY',27,ink,'F3');
  const address=String(current.companyAddress||'').split('\n').map(s=>s.trim()).filter(Boolean);
@@ -2992,8 +2991,7 @@ function downloadTowelSummaryPdf(){
  // Statement summary with a dramatic typographic anchor
  text(43,214,'SUMMARY',10,copper,'F2');
  text(43,247,'Monthly statement',23,ink,'F3');
- right(551,216,'REPORT PERIOD',8,muted,'F2');
- right(551,244,englishMonth+' '+year,13,ink,'F2');
+ right(551,216,'FINANCIAL OVERVIEW',8,muted,'F2');
  // Stat row: understated no large dashboard cards
  const metrics=[['GROSS SALES',cash(sales)],['STAFF COST / 20%',cash(staff)],['NET RESULT',cash(sub)]];
  line(43,267,552,267,ink,.9);
@@ -3024,7 +3022,7 @@ function downloadTowelSummaryPdf(){
  let recipients=shares.filter(s=>String(s.name||'').trim());
  recipients.slice(0,3).forEach((s,i)=>{const x=43+i*170,y=790;text(x,y,String(s.name).toUpperCase().slice(0,16)+' / '+Number(s.pct||0)+'%',8,muted,'F2');text(x,y+19,cash(sub*Number(s.pct||0)/100),12,ink,'F2')});
  if(recipients.length>3)text(43,830,'Additional recipients: '+recipients.slice(3).map(s=>s.name+' '+s.pct+'%').join(', ').slice(0,99),7,muted);
- else {line(43,826,552,826,rule,.6);text(43,837,'LEINGBOX  /  '+mb+'  /  '+englishMonth+' '+year,7,muted)}
+ else {line(43,826,552,826,rule,.6)}
  // Single-page compact PDF, downloadable offline
  const stream=commands.join('\n')+'\n',encoder=new TextEncoder();
  const objs=[null,'<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R /F3 6 0 R >> >> /Contents 7 0 R >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>','<< /Type /Font /Subtype /Type1 /BaseFont /Times-Bold >>',`<< /Length ${encoder.encode(stream).length} >>\nstream\n${stream}endstream`];
