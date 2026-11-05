@@ -1302,12 +1302,10 @@ body{
 
 
 <section id="towelPage" class="panel towel-page" style="display:none">
- <h2>MB Towel Monthly Report</h2><div class="tw-note">每个 MB 独立月报 · 填写每周数量后自动计算 · 云端保存需要先安装随附 SQL</div>
+ <h2>MB Towel Monthly Report</h2><div class="tw-note">固定 MB3–MB27（共 25 个）· 每个 MB 独立月报 · 填写每周数量后自动计算 · 云端保存需要先安装随附 SQL</div>
  <div class="tw-toolbar">
   <label>MB / 负责人<select id="twMb"></select></label>
   <label>月份<input type="month" id="twMonth"></label>
-  <button type="button" id="twAddMb">＋ Add MB</button>
-  <button type="button" id="twDeleteMb">删除 MB</button>
   <button type="button" id="twCopyPrev">复制上个月设置</button>
  </div>
  <div class="tw-report" id="twPrintReport">
@@ -2883,7 +2881,8 @@ const SIZES=['25x25','50x25','70x35','110x55','140x70'], PRICES=[1,2,3,8,12];
 const el=id=>document.getElementById(id), money=n=>'$'+Number(n||0).toLocaleString('en-SG',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const base=()=>({weekly:Array.from({length:5},()=>[0,0,0,0,0]),prices:[...PRICES],opening:[2000,2000,2000,2000,2000],received:[0,0,0,0,0],cage:1360,rental:6400,delivery:250,other:0,staffPct:20,sharePct:50,staff:'',remark:''});
-let current=base(), mbNames=['MB-1'], stored={}, dirty=false, loadSeq=0, serverOK=false;
+const MB_NAMES=Array.from({length:25},(_,i)=>'MB'+(i+3));
+let current=base(), mbNames=[...MB_NAMES], stored={}, dirty=false, loadSeq=0, serverOK=false;
 const key=()=>el('twMb').value+'|'+el('twMonth').value;
 function status(msg,isBad=false){el('twStatus').textContent=msg;el('twStatus').classList.toggle('tw-bad',isBad)}
 function num(v){return Number.isFinite(Number(v))?Number(v):0}
@@ -2916,7 +2915,7 @@ function menu(){el('twMb').innerHTML=mbNames.map(n=>`<option value="${esc(n)}">$
 function readInput(e){let t=e.target,d=t.dataset;if(d.week!==undefined){let n=num(t.value);current.weekly[+d.week][+d.size]=Math.max(0,Math.trunc(n));}else if(d.price!==undefined)current.prices[+d.price]=Math.max(0,num(t.value));else if(d.opening!==undefined)current.opening[+d.opening]=Math.max(0,Math.trunc(num(t.value)));else if(d.received!==undefined)current.received[+d.received]=Math.max(0,Math.trunc(num(t.value)));else{const map={twCage:'cage',twRental:'rental',twDelivery:'delivery',twOther:'other',twStaffPct:'staffPct',twSharePct:'sharePct',twStaff:'staff',twRemark:'remark'};if(map[t.id]){let k=map[t.id];current[k]=['staff','remark'].includes(k)?t.value:Math.max(0,num(t.value));if(k.endsWith('Pct'))current[k]=Math.min(100,current[k]);}else return;}dirty=true;recalc();status('未保存更改 · 点击「保存月报到云端」')}
 async function loadMonth(){const seq=++loadSeq;if(dirty&&!confirm('当前有未保存的更改，确定切换吗？'))return false;dirty=false;let k=key();current=safeData(stored[k]);render();status('读取云端数据中…');try{let user=await client.auth.getUser(),email=user.data.user?.email?.toLowerCase();if(!email)throw Error('未登录');let {data,error}=await client.from('leingbox_towel_reports').select('report').eq('username',email).eq('mb_name',el('twMb').value).eq('report_month',el('twMonth').value+'-01').maybeSingle();if(error)throw error;if(seq!==loadSeq)return false;serverOK=true;if(data){current=safeData(data.report);stored[k]=structuredClone(current)}else current=safeData(stored[k]);render();status(data?'已读取云端月报':'该月份暂无云端记录，可开始填写');return true;}catch(e){console.error(e);if(seq!==loadSeq)return false;serverOK=false;status('云端月报未连接：请先执行附带 SQL。当前输入不会自动同步其他设备。',true);return false}}
 async function save(){let mb=el('twMb').value,month=el('twMonth').value;if(!mb||!month){status('请选择 MB 和月份',true);return;}const snapshot=JSON.parse(JSON.stringify(current));status('保存中…');try{let user=await client.auth.getUser(),email=user.data.user?.email?.toLowerCase();if(!email)throw Error('未登录');const {error}=await client.from('leingbox_towel_reports').upsert({username:email,mb_name:mb,report_month:month+'-01',report:snapshot,updated_at:new Date().toISOString()},{onConflict:'username,mb_name,report_month'});if(error)throw error;stored[mb+'|'+month]=snapshot;dirty=false;serverOK=true;status('✓ 保存成功，已写入云端数据库');}catch(e){console.error(e);status('保存失败：'+e.message+'。请先执行随附 SQL，不能视为已保存。',true)}}
-async function loadMbNames(){try{const u=await client.auth.getUser(),email=u.data.user?.email?.toLowerCase();if(!email)return;const {data,error}=await client.from('leingbox_towel_reports').select('mb_name').eq('username',email).limit(1000);if(error)throw error;mbNames=[...new Set([...mbNames,...(data||[]).map(d=>d.mb_name)])].sort();menu();}catch(e){console.warn('MB names not loaded',e)}}
+async function loadMbNames(){const previous=el('twMb').value;mbNames=[...MB_NAMES];menu();if(mbNames.includes(previous))el('twMb').value=previous;}
 async function switchTo(mb,month){const prevMb=el('twMb').value,prevMonth=el('twMonth').value;const success=await loadMonth();if(!success&&dirty){el('twMb').value=prevMb;el('twMonth').value=prevMonth}}
 function csvExport(){const {qty,sales,staff,sub,share}=calculate(),rows=[['MB',el('twMb').value],['Month',el('twMonth').value],['Staff',current.staff],[],['Size','Week 1','Week 2','Week 3','Week 4','Week 5','Monthly Qty','Unit Price','Total Price','Opening','Received','Balance']];SIZES.forEach((sz,i)=>rows.push([sz,...current.weekly.map(w=>w[i]),qty[i],current.prices[i],qty[i]*current.prices[i],current.opening[i],current.received[i],current.opening[i]+current.received[i]-qty[i]]));rows.push([],['Sales',sales],['Cage',current.cage],['Rental',current.rental],['Delivery',current.delivery],['Other',current.other],['Staff',staff],['Subtotal',sub],['Share',share]);let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\r\n');let url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));let a=document.createElement('a');a.href=url;a.download='MB-Towel-'+el('twMb').value.replace(/[^\w-]/g,'_')+'-'+el('twMonth').value+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 const original=sidebarShowPage;
@@ -2925,8 +2924,6 @@ document.addEventListener('DOMContentLoaded',()=>{renderStructure();el('twMonth'
  el('towelPage').addEventListener('input',readInput);
  for(const id of ['twMb','twMonth'])el(id).addEventListener('focus',e=>e.target.dataset.prior=e.target.value);
  for(const id of ['twMb','twMonth'])el(id).addEventListener('change',async e=>{if(dirty&&!confirm('尚有未保存的更改，要放弃并切换吗？')){e.target.value=e.target.dataset.prior;return}dirty=false;await loadMonth();e.target.dataset.prior=e.target.value});
- el('twAddMb').onclick=async()=>{let name=prompt('请输入 MB 编号 / 名称（例如 MB-5-AUG）');if(!name)return;name=name.trim().slice(0,80);if(!name)return;if(!mbNames.includes(name))mbNames.push(name);menu();el('twMb').value=name;dirty=false;await loadMonth()};
- el('twDeleteMb').onclick=async()=>{const name=el('twMb').value;if(!confirm('删除 '+name+' 的全部月份云端报告？此操作不可撤销。'))return;try{const u=await client.auth.getUser(),email=u.data.user?.email?.toLowerCase();if(!email)throw Error('未登录');const {error}=await client.from('leingbox_towel_reports').delete().eq('username',email).eq('mb_name',name);if(error)throw error;mbNames=mbNames.filter(n=>n!==name);if(!mbNames.length)mbNames=['MB-1'];menu();dirty=false;await loadMonth()}catch(e){status('删除失败: '+e.message,true)}};
  el('twCopyPrev').onclick=async()=>{let month=el('twMonth').value;if(!month)return;let d=new Date(month+'-01T12:00:00');d.setMonth(d.getMonth()-1);const pm=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(!confirm('从 '+pm+' 复制单价、开销、员工及分成设置？不会复制旧数量。'))return;try{const u=await client.auth.getUser(),email=u.data.user?.email?.toLowerCase();const {data,error}=await client.from('leingbox_towel_reports').select('report').eq('username',email).eq('mb_name',el('twMb').value).eq('report_month',pm+'-01').maybeSingle();if(error)throw error;if(!data){status('上个月没有记录',true);return}let old=safeData(data.report);for(const k of ['prices','cage','rental','delivery','other','staffPct','sharePct','staff','remark'])current[k]=old[k];dirty=true;render();status('已复制设置，尚未保存（数量保持本月原值）')}catch(e){status('复制失败：'+e.message,true)}};
  el('twSave').onclick=save;el('twPdf').onclick=()=>window.print();el('twCSV').onclick=csvExport;
 });
