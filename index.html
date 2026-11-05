@@ -1201,7 +1201,11 @@ body{
 .menu-toggle{
   left:max(12px, env(safe-area-inset-left))!important;
 }
-.app-sidebar{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;padding-bottom:calc(28px + env(safe-area-inset-bottom))!important}.sidebar-nav{padding-bottom:30px!important}.db-inline-note{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:2000;display:none;max-width:88vw;padding:10px 14px;border:1px solid #eadfce;border-radius:11px;background:#fff9ef;color:#775b34;font-size:10px}.db-inline-note.show{display:block}</style>
+.app-sidebar{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;padding-bottom:calc(28px + env(safe-area-inset-bottom))!important}.sidebar-nav{padding-bottom:30px!important}.db-inline-note{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:2000;display:none;max-width:88vw;padding:10px 14px;border:1px solid #eadfce;border-radius:11px;background:#fff9ef;color:#775b34;font-size:10px}.db-inline-note.show{display:block}
+/* MB towel module */
+.towel-page{max-width:1100px;margin:0 auto}.towel-page .tw-toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:end;margin:14px 0}.tw-toolbar>label{flex:1 1 145px;margin:0}.tw-toolbar input,.tw-toolbar select,.tw-costs input,.tw-headerfields input{border:1px solid #d6deea;border-radius:8px;padding:9px;min-width:0;width:100%;font-size:14px}.tw-toolbar button,.tw-actions button{border:1px solid #ccd5e4;border-radius:9px;background:#f3f7fc;padding:10px 13px;cursor:pointer;font-weight:700}.tw-toolbar .tw-primary,.tw-actions .tw-primary{background:#0a427d;color:white}.towel-page label{font-size:12px;color:#4b6079;margin:0 0 5px}.tw-note{font-size:12px;color:#64748b;margin:9px 0}.tw-report{background:white;color:#18304c;border:1px solid #cdd9e7;border-radius:12px;overflow:hidden;box-shadow:0 6px 16px #13396612}.tw-hero{background:linear-gradient(125deg,#073362,#07549a);padding:20px;color:white;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.tw-hero h3{font-size:26px;margin:0 0 5px}.tw-hero input{background:#ffffff16;color:white;border:1px solid #ffffff77;border-radius:6px;padding:7px;max-width:180px}.tw-hero input::placeholder{color:#d9e8f4}.tw-hero input[type=number]{width:75px}.tw-paper{padding:20px}.tw-paper h3{text-align:center;font-size:25px;margin:3px 0 17px}.tw-scroll{overflow-x:auto}.tw-report table{width:100%;border-collapse:collapse;min-width:600px;font-size:13px}.tw-report th{background:#0c477f;color:white;text-align:left;padding:10px 9px}.tw-report td{border:1px solid #c5d1de;padding:6px 8px}.tw-report td input{width:100%;min-width:55px;border:1px solid #e0e8f2;border-radius:5px;padding:7px;background:#fff;font-size:13px}.tw-report td input[type=number]{text-align:right}.tw-report tfoot td{background:#eaf2fb;font-weight:800}.tw-result{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}.tw-result table{min-width:0}.tw-result .tw-boxhead{background:#0c477f;color:white;font-weight:800;padding:10px}.tw-costs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:10px;background:#f7faff;border-radius:8px;margin-bottom:10px}.tw-costs label{display:block}.tw-costs input{margin-top:5px}.tw-split{margin-top:12px}.tw-actions{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}.tw-balance td,.tw-stats td{padding:9px}.tw-status{min-height:20px;font-size:12px;color:#315b84}.tw-compact input{max-width:75px}.tw-infotext{font-size:12px;color:#64748b}.tw-bad{color:#b42318!important}.tw-week-label{font-size:13px;margin:12px 0 5px;font-weight:800;color:#0a427d}.tw-guide{font-size:12px;color:#57708a;margin-top:10px}@media(max-width:700px){.tw-hero{padding:14px}.tw-paper{padding:12px}.tw-result{grid-template-columns:1fr}.tw-costs{grid-template-columns:1fr 1fr}.tw-hero h3{font-size:21px}}
+@media print{body{background:#fff!important}.app-sidebar,.sidebar-overlay,.menu-toggle,.topbar,.tw-toolbar,.tw-actions,.tw-note,.tw-status,.tw-guide,.tw-edit-only,section.panel:not(#towelPage),#loginPage{display:none!important}#financePage,#towelPage{display:block!important}#towelPage{box-shadow:none!important;border:0!important;max-width:none!important;padding:0!important;margin:0!important}.container{max-width:none!important;margin:0!important;padding:0!important}.tw-report{box-shadow:none;border:0;border-radius:0}.tw-hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}.tw-report th,.tw-boxhead,.tw-report tfoot td{-webkit-print-color-adjust:exact;print-color-adjust:exact}.tw-paper{padding:12px}.tw-report input{border:0!important;padding:0!important;background:transparent!important;color:inherit!important}.tw-report input[type=number]{text-align:right}.tw-week-label{break-after:avoid}.tw-week{break-inside:avoid}.tw-result{break-inside:avoid} @page{size:A4 portrait;margin:10mm}}
+</style>
 </head>
 <body><div id="dbInlineNote" class="db-inline-note"></div>
 
@@ -1217,7 +1221,7 @@ body{
 <button data-page="investmentPage">投资表</button><button data-page="projectPage">债务表</button>
 <button data-page="receivablePage">别人欠我</button><button data-page="wealthPage">财富分配</button>
 <button data-page="agentPage">中介业务</button><button data-page="fxPage">汇率换算</button>
-<button data-page="historyPage">历史记录</button></nav>
+<button data-page="historyPage">历史记录</button><button data-page="towelPage">MB 毛巾月报</button></nav>
 </aside>
 
   <section id="loginPage" class="login-page">
@@ -1295,6 +1299,25 @@ body{
 
 
 
+
+
+<section id="towelPage" class="panel towel-page" style="display:none">
+ <h2>MB Towel Monthly Report</h2><div class="tw-note">每个 MB 独立月报 · 填写每周数量后自动计算 · 云端保存需要先安装随附 SQL</div>
+ <div class="tw-toolbar">
+  <label>MB / 负责人<select id="twMb"></select></label>
+  <label>月份<input type="month" id="twMonth"></label>
+  <button type="button" id="twAddMb">＋ Add MB</button>
+  <button type="button" id="twDeleteMb">删除 MB</button>
+  <button type="button" id="twCopyPrev">复制上个月设置</button>
+ </div>
+ <div class="tw-report" id="twPrintReport">
+  <div class="tw-hero"><div><h3>MCT BEAUTY</h3><div>51 ubi avenue 1, #08-04 paya ubi<br>industrial park singapore 408933<br>Tel: 88777451</div></div><div class="tw-headerfields"><div id="twReportRef">MB · MONTH</div><label style="color:white">Staff<input id="twStaff" placeholder="Staff name"></label><label style="color:white">Remark<input id="twRemark" placeholder="例如 (WEIWEI) - 50%"></label></div></div>
+  <div class="tw-paper"><h3>Summary Report</h3><div id="twWeekly"></div>
+   <h3 style="margin-top:23px">Monthly Summary</h3><div class="tw-scroll"><table><thead><tr><th>Items</th><th>Qty</th><th>Unit Price (SGD)</th><th>Total Price</th></tr></thead><tbody id="twMonthly"></tbody><tfoot><tr><td>Sales</td><td id="twTotalQty"></td><td></td><td id="twSales"></td></tr></tfoot></table></div>
+   <div class="tw-result"><div><div class="tw-boxhead">Towel Balance</div><table class="tw-balance"><thead><tr><th>Size</th><th>Opening</th><th>Received</th><th>Balance</th></tr></thead><tbody id="twStock"></tbody></table><div class="tw-guide">Balance = Opening + Received − Monthly Qty. 余额为负数时会提示。</div></div><div><div class="tw-costs"><label>Cage (SGD)<input id="twCage" type="number" min="0" step="0.01"></label><label>Rental (SGD)<input id="twRental" type="number" min="0" step="0.01"></label><label>Delivery (SGD)<input id="twDelivery" type="number" min="0" step="0.01"></label><label>Staff (%)<input id="twStaffPct" type="number" min="0" max="100" step="0.01"></label><label>Share (%)<input id="twSharePct" type="number" min="0" max="100" step="0.01"></label><label>Other expenses (SGD)<input id="twOther" type="number" min="0" step="0.01"></label></div><table class="tw-stats"><tbody id="twFinance"></tbody></table><div class="tw-split" id="twShares"></div></div></div>
+  </div></div>
+ <div class="tw-actions"><button type="button" class="tw-primary" id="twSave">保存月报到云端</button><button type="button" id="twPdf">打印 / 保存 PDF</button><button type="button" id="twCSV">导出 CSV</button></div><div id="twStatus" class="tw-status" role="status"></div>
+</section>
 
 <section id="businessPage" class="panel business-page" style="display:none">
   <div class="panel-head">
@@ -2717,7 +2740,7 @@ function sidebarOpen(){
   document.getElementById("sidebarOverlay")?.classList.add("open");
 }
 async function sidebarShowPage(page){
-  ["projectPage","historyPage","investmentPage","receivablePage","wealthPage","agentPage","fxPage","businessPage"].forEach(id=>{
+  ["projectPage","historyPage","investmentPage","receivablePage","wealthPage","agentPage","fxPage","businessPage","towelPage"].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display=id===page?"":"none";
   });
   document.querySelectorAll(".sidebar-nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
@@ -2852,5 +2875,62 @@ sidebarShowPage=async function(page){
  if(page==="fxPage"){document.getElementById("fxDate").value=new Date().toISOString().slice(0,10);await loadFxTransactions();fxCalc();}
 };
 </script>
-<script>function showDbNote(message){const n=document.getElementById("dbInlineNote");if(!n)return;n.textContent=message;n.classList.add("show");clearTimeout(window.__dbNoteTimer);window.__dbNoteTimer=setTimeout(()=>n.classList.remove("show"),5000);}</script></body>
+<script>function showDbNote(message){const n=document.getElementById("dbInlineNote");if(!n)return;n.textContent=message;n.classList.add("show");clearTimeout(window.__dbNoteTimer);window.__dbNoteTimer=setTimeout(()=>n.classList.remove("show"),5000);}</script>
+<script>
+/* MB Towel reporting. Storage: public.leingbox_towel_reports (per user + MB + month). */
+(function(){
+const SIZES=['25x25','50x25','70x35','110x55','140x70'], PRICES=[1,2,3,8,12];
+const el=id=>document.getElementById(id), money=n=>'$'+Number(n||0).toLocaleString('en-SG',{minimumFractionDigits:2,maximumFractionDigits:2});
+const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const base=()=>({weekly:Array.from({length:5},()=>[0,0,0,0,0]),prices:[...PRICES],opening:[2000,2000,2000,2000,2000],received:[0,0,0,0,0],cage:1360,rental:6400,delivery:250,other:0,staffPct:20,sharePct:50,staff:'',remark:''});
+let current=base(), mbNames=['MB-1'], stored={}, dirty=false, loadSeq=0, serverOK=false;
+const key=()=>el('twMb').value+'|'+el('twMonth').value;
+function status(msg,isBad=false){el('twStatus').textContent=msg;el('twStatus').classList.toggle('tw-bad',isBad)}
+function num(v){return Number.isFinite(Number(v))?Number(v):0}
+function safeData(raw){let b=base(),r=raw&&typeof raw==='object'?raw:{};for(const k of ['weekly','prices','opening','received'])if(Array.isArray(r[k]))b[k]=r[k];for(const k of ['cage','rental','delivery','other','staffPct','sharePct','staff','remark'])if(r[k]!==undefined)b[k]=r[k];b.weekly=Array.from({length:5},(_,w)=>Array.from({length:5},(_,i)=>Math.max(0,Math.trunc(num(b.weekly?.[w]?.[i])))));for(const k of ['prices','opening','received'])b[k]=SIZES.map((_,i)=>Math.max(0,num(b[k]?.[i])));for(const k of ['cage','rental','delivery','other'])b[k]=Math.max(0,num(b[k]));for(const k of ['staffPct','sharePct'])b[k]=Math.max(0,Math.min(100,num(b[k])));return b}
+function sums(){return SIZES.map((_,i)=>current.weekly.reduce((a,w)=>a+num(w[i]),0))}
+function calculate(){const qty=sums(),sales=qty.reduce((t,q,i)=>t+q*current.prices[i],0);const staff=sales*current.staffPct/100;const sub=sales-current.cage-current.rental-current.delivery-current.other-staff;return {qty,sales,staff,sub,share:sub*current.sharePct/100}}
+function renderStructure(){
+ el('twWeekly').innerHTML=Array.from({length:5},(_,w)=>`<div class="tw-week"><div class="tw-week-label">Week ${w+1}</div><div class="tw-scroll"><table><thead><tr><th>Items</th><th>Qty</th><th>Unit Price</th><th>Total Price</th></tr></thead><tbody>${SIZES.map((sz,i)=>`<tr><td>Bamboo Towel ${sz}</td><td><input data-week="${w}" data-size="${i}" type="number" min="0" step="1" aria-label="Week ${w+1} ${sz}"></td><td id="twWp${w}_${i}"></td><td id="twWt${w}_${i}"></td></tr>`).join('')}</tbody><tfoot><tr><td>Total</td><td id="twWq${w}"></td><td></td><td id="twWsum${w}"></td></tr></tfoot></table></div></div>`).join('');
+ el('twMonthly').innerHTML=SIZES.map((sz,i)=>`<tr><td>Bamboo Towel ${sz}</td><td id="twMq${i}"></td><td class="tw-compact"><input type="number" min="0" step="0.01" data-price="${i}" aria-label="Price ${sz}"></td><td id="twMt${i}"></td></tr>`).join('');
+ el('twStock').innerHTML=SIZES.map((sz,i)=>`<tr><td>${sz}</td><td><input type="number" min="0" step="1" data-opening="${i}" aria-label="Opening ${sz}"></td><td><input type="number" min="0" step="1" data-received="${i}" aria-label="Received ${sz}"></td><td id="twBal${i}"></td></tr>`).join('');
+}
+function render(){
+ el('twReportRef').textContent=el('twMb').value+' · '+el('twMonth').value;
+ el('twStaff').value=current.staff;el('twRemark').value=current.remark;
+ for(const k of ['cage','rental','delivery','other','staffPct','sharePct'])el('tw'+k[0].toUpperCase()+k.slice(1)).value=current[k];
+ document.querySelectorAll('[data-week]').forEach(n=>n.value=current.weekly[+n.dataset.week][+n.dataset.size]);
+ document.querySelectorAll('[data-price]').forEach(n=>n.value=current.prices[+n.dataset.price]);
+ document.querySelectorAll('[data-opening]').forEach(n=>n.value=current.opening[+n.dataset.opening]);
+ document.querySelectorAll('[data-received]').forEach(n=>n.value=current.received[+n.dataset.received]);
+ recalc();
+}
+function recalc(){let {qty,sales,staff,sub,share}=calculate();
+ for(let w=0;w<5;w++){let sum=0,qsum=0;for(let i=0;i<5;i++){const q=current.weekly[w][i],v=q*current.prices[i];sum+=v;qsum+=q;el(`twWp${w}_${i}`).textContent=money(current.prices[i]);el(`twWt${w}_${i}`).textContent=money(v)}el('twWq'+w).textContent=qsum;el('twWsum'+w).textContent=money(sum)}
+ qty.forEach((q,i)=>{el('twMq'+i).textContent=q;el('twMt'+i).textContent=money(q*current.prices[i]);let b=current.opening[i]+current.received[i]-q;el('twBal'+i).textContent=b;el('twBal'+i).classList.toggle('tw-bad',b<0)});
+ el('twTotalQty').textContent=qty.reduce((a,b)=>a+b,0);el('twSales').textContent=money(sales);
+ el('twFinance').innerHTML=[['Sales',sales],['Cage',current.cage],['Rental',current.rental],['Delivery',current.delivery],['Other',current.other],[`Staff (${current.staffPct}%)`,staff],['Subtotal',sub],[`Share (${current.sharePct}%)`,share],[`Remaining (${100-current.sharePct}%)`,sub-share]].map(([name,value],i)=>`<tr ${i===6||i===7?'style="background:#e6f0fb;font-weight:800"':''}><td>${esc(name)}</td><td style="text-align:right">${money(value)}</td></tr>`).join('');
+ el('twShares').textContent='MB share: '+money(share)+' · Other share: '+money(sub-share);
+}
+function menu(){el('twMb').innerHTML=mbNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}
+function readInput(e){let t=e.target,d=t.dataset;if(d.week!==undefined){let n=num(t.value);current.weekly[+d.week][+d.size]=Math.max(0,Math.trunc(n));}else if(d.price!==undefined)current.prices[+d.price]=Math.max(0,num(t.value));else if(d.opening!==undefined)current.opening[+d.opening]=Math.max(0,Math.trunc(num(t.value)));else if(d.received!==undefined)current.received[+d.received]=Math.max(0,Math.trunc(num(t.value)));else{const map={twCage:'cage',twRental:'rental',twDelivery:'delivery',twOther:'other',twStaffPct:'staffPct',twSharePct:'sharePct',twStaff:'staff',twRemark:'remark'};if(map[t.id]){let k=map[t.id];current[k]=['staff','remark'].includes(k)?t.value:Math.max(0,num(t.value));if(k.endsWith('Pct'))current[k]=Math.min(100,current[k]);}else return;}dirty=true;recalc();status('未保存更改 · 点击「保存月报到云端」')}
+async function loadMonth(){const seq=++loadSeq;if(dirty&&!confirm('当前有未保存的更改，确定切换吗？'))return false;dirty=false;let k=key();current=safeData(stored[k]);render();status('读取云端数据中…');try{let user=await client.auth.getUser(),email=user.data.user?.email?.toLowerCase();if(!email)throw Error('未登录');let {data,error}=await client.from('leingbox_towel_reports').select('report').eq('username',email).eq('mb_name',el('twMb').value).eq('report_month',el('twMonth').value+'-01').maybeSingle();if(error)throw error;if(seq!==loadSeq)return false;serverOK=true;if(data){current=safeData(data.report);stored[k]=structuredClone(current)}else current=safeData(stored[k]);render();status(data?'已读取云端月报':'该月份暂无云端记录，可开始填写');return true;}catch(e){console.error(e);if(seq!==loadSeq)return false;serverOK=false;status('云端月报未连接：请先执行附带 SQL。当前输入不会自动同步其他设备。',true);return false}}
+async function save(){let mb=el('twMb').value,month=el('twMonth').value;if(!mb||!month){status('请选择 MB 和月份',true);return;}const snapshot=JSON.parse(JSON.stringify(current));status('保存中…');try{let user=await client.auth.getUser(),email=user.data.user?.email?.toLowerCase();if(!email)throw Error('未登录');const {error}=await client.from('leingbox_towel_reports').upsert({username:email,mb_name:mb,report_month:month+'-01',report:snapshot,updated_at:new Date().toISOString()},{onConflict:'username,mb_name,report_month'});if(error)throw error;stored[mb+'|'+month]=snapshot;dirty=false;serverOK=true;status('✓ 保存成功，已写入云端数据库');}catch(e){console.error(e);status('保存失败：'+e.message+'。请先执行随附 SQL，不能视为已保存。',true)}}
+async function loadMbNames(){try{const u=await client.auth.getUser(),email=u.data.user?.email?.toLowerCase();if(!email)return;const {data,error}=await client.from('leingbox_towel_reports').select('mb_name').eq('username',email).limit(1000);if(error)throw error;mbNames=[...new Set([...mbNames,...(data||[]).map(d=>d.mb_name)])].sort();menu();}catch(e){console.warn('MB names not loaded',e)}}
+async function switchTo(mb,month){const prevMb=el('twMb').value,prevMonth=el('twMonth').value;const success=await loadMonth();if(!success&&dirty){el('twMb').value=prevMb;el('twMonth').value=prevMonth}}
+function csvExport(){const {qty,sales,staff,sub,share}=calculate(),rows=[['MB',el('twMb').value],['Month',el('twMonth').value],['Staff',current.staff],[],['Size','Week 1','Week 2','Week 3','Week 4','Week 5','Monthly Qty','Unit Price','Total Price','Opening','Received','Balance']];SIZES.forEach((sz,i)=>rows.push([sz,...current.weekly.map(w=>w[i]),qty[i],current.prices[i],qty[i]*current.prices[i],current.opening[i],current.received[i],current.opening[i]+current.received[i]-qty[i]]));rows.push([],['Sales',sales],['Cage',current.cage],['Rental',current.rental],['Delivery',current.delivery],['Other',current.other],['Staff',staff],['Subtotal',sub],['Share',share]);let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\r\n');let url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));let a=document.createElement('a');a.href=url;a.download='MB-Towel-'+el('twMb').value.replace(/[^\w-]/g,'_')+'-'+el('twMonth').value+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+const original=sidebarShowPage;
+sidebarShowPage=async function(page){await original(page);if(page==='towelPage'){await loadMbNames();if(!el('twMonth').value)el('twMonth').value=new Date().toLocaleDateString('en-CA').slice(0,7);await loadMonth()}};
+document.addEventListener('DOMContentLoaded',()=>{renderStructure();el('twMonth').value=new Date().toLocaleDateString('en-CA').slice(0,7);menu();render();
+ el('towelPage').addEventListener('input',readInput);
+ for(const id of ['twMb','twMonth'])el(id).addEventListener('focus',e=>e.target.dataset.prior=e.target.value);
+ for(const id of ['twMb','twMonth'])el(id).addEventListener('change',async e=>{if(dirty&&!confirm('尚有未保存的更改，要放弃并切换吗？')){e.target.value=e.target.dataset.prior;return}dirty=false;await loadMonth();e.target.dataset.prior=e.target.value});
+ el('twAddMb').onclick=async()=>{let name=prompt('请输入 MB 编号 / 名称（例如 MB-5-AUG）');if(!name)return;name=name.trim().slice(0,80);if(!name)return;if(!mbNames.includes(name))mbNames.push(name);menu();el('twMb').value=name;dirty=false;await loadMonth()};
+ el('twDeleteMb').onclick=async()=>{const name=el('twMb').value;if(!confirm('删除 '+name+' 的全部月份云端报告？此操作不可撤销。'))return;try{const u=await client.auth.getUser(),email=u.data.user?.email?.toLowerCase();if(!email)throw Error('未登录');const {error}=await client.from('leingbox_towel_reports').delete().eq('username',email).eq('mb_name',name);if(error)throw error;mbNames=mbNames.filter(n=>n!==name);if(!mbNames.length)mbNames=['MB-1'];menu();dirty=false;await loadMonth()}catch(e){status('删除失败: '+e.message,true)}};
+ el('twCopyPrev').onclick=async()=>{let month=el('twMonth').value;if(!month)return;let d=new Date(month+'-01T12:00:00');d.setMonth(d.getMonth()-1);const pm=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;if(!confirm('从 '+pm+' 复制单价、开销、员工及分成设置？不会复制旧数量。'))return;try{const u=await client.auth.getUser(),email=u.data.user?.email?.toLowerCase();const {data,error}=await client.from('leingbox_towel_reports').select('report').eq('username',email).eq('mb_name',el('twMb').value).eq('report_month',pm+'-01').maybeSingle();if(error)throw error;if(!data){status('上个月没有记录',true);return}let old=safeData(data.report);for(const k of ['prices','cage','rental','delivery','other','staffPct','sharePct','staff','remark'])current[k]=old[k];dirty=true;render();status('已复制设置，尚未保存（数量保持本月原值）')}catch(e){status('复制失败：'+e.message,true)}};
+ el('twSave').onclick=save;el('twPdf').onclick=()=>window.print();el('twCSV').onclick=csvExport;
+});
+})();
+</script>
+</body>
 </html>
